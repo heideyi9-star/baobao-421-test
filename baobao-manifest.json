@@ -1,0 +1,19 @@
+{
+  "name": "豹豹机",
+  "short_name": "豹豹机",
+  "description": "豹豹机 421 · 图片瘦身版：app.js 从 4MB 降到 1.8MB，减少重复下载",
+  "start_url": "./?v=421",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f7f7",
+  "theme_color": "#f7f7f7",
+  "icons": [
+    {
+      "src": "./apple-touch-icon.png?v=331",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

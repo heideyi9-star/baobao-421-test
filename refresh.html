@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>更新豹豹机</title></head>
+<body style="font-family:-apple-system,sans-serif;padding:28px;line-height:1.7"><p>正在清理旧页面缓存……</p><script>
+(async function(){
+  try{
+    if("serviceWorker" in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }
+    if("caches" in window){
+      const keys=await caches.keys();
+      await Promise.all(keys.filter(k=>/^baobao-shell-/i.test(k)).map(k=>caches.delete(k)));
+    }
+  }catch(e){}
+  location.replace("./?fresh=420");
+})();
+</script></body></html>

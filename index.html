@@ -1,0 +1,4324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<!-- index(307)：拆除多层聊天引擎叠加，普通私聊改为单一自然聊天核心。 -->
+<meta name="apple-mobile-web-app-title" content="斑斑豹">
+<script id="bb-early-start-v274">
+(function(){
+  "use strict";
+  function tick(){
+    var d=new Date();
+    var t=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+    var a=document.getElementById("lockTime");
+    var b=document.getElementById("clock");
+    if(a)a.textContent=t;
+    if(b)b.textContent=t;
+  }
+  tick();
+  var timer=setInterval(tick,500);
+  window.addEventListener("load",function(){tick();setTimeout(function(){clearInterval(timer);},15000);},{once:true});
+})();
+</script>
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=304">
+<link rel="apple-touch-icon-precomposed" href="./apple-touch-icon.png?v=304">
+<link rel="icon" type="image/png" sizes="512x512" href="./apple-touch-icon.png?v=304">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<link rel="manifest" href="./baobao-manifest.json?v=421">
+<script id="bb-pwa-cache-v421">
+(function(){
+  "use strict";
+  var VERSION="421";
+  var RELOAD_KEY="bb_sw_reload_"+VERSION;
+
+  /* 只清理豹豹机旧壳缓存，不碰聊天、人设、头像或 API 设置。 */
+  if("caches" in window){
+    caches.keys().then(function(keys){
+      return Promise.all(keys.filter(function(key){
+        return /^baobao-shell-/i.test(key) && key!=="baobao-shell-v"+VERSION;
+      }).map(function(key){ return caches.delete(key); }));
+    }).catch(function(){});
+  }
+
+  if(!("serviceWorker" in navigator))return;
+  var reloading=false;
+  navigator.serviceWorker.addEventListener("controllerchange",function(){
+    if(reloading)return;
+    reloading=true;
+    try{
+      if(sessionStorage.getItem(RELOAD_KEY)!=="1"){
+        sessionStorage.setItem(RELOAD_KEY,"1");
+        location.reload();
+      }
+    }catch(error){ location.reload(); }
+  });
+
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("./sw.js?v="+VERSION,{
+      scope:"./",
+      updateViaCache:"none"
+    }).then(function(registration){
+      try{ registration.update(); }catch(error){}
+    }).catch(function(){});
+  },{once:true});
+})();
+</script>
+<meta name="theme-color" content="#f7f7f7">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<title>豹豹机4.9 · 420 轻量白屏修复版</title>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="bb-transfer-detail-mask" id="bbTransferDetailMask">
+ <div class="bb-transfer-detail">
+  <h3>收到一笔转账</h3>
+  <div class="bb-transfer-detail-money" id="bbTransferDetailMoney"></div>
+  <div id="bbTransferDetailNote"></div>
+  <div class="bb-transfer-actions">
+   <button class="bb-transfer-back" onclick="handleTransferAction('reject')">退回</button>
+   <button class="bb-transfer-ok" onclick="handleTransferAction('accept')">确认收款</button>
+  </div>
+ </div>
+</div>
+
+<style id="bb-critical-shell-v286">
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif}
+html,body{margin:0;width:100%;height:100%;background:#000;overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;touch-action:none}
+.phone{width:min(100vw,390px);height:min(100vh,844px);border:10px solid #111;border-radius:55px;overflow:hidden;position:relative;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.screen{width:100%;height:100%;position:absolute;inset:0;background-size:cover;background-position:center}
+.hidden{display:none!important}
+.lock{color:#333;text-align:center;padding-top:110px;z-index:2;background:#f7f7f7}
+.lock .time{font-size:clamp(86px,22vw,120px);font-weight:800;letter-spacing:-3px}
+.lock-card{width:calc(100% - 36px);margin:50px auto;background:rgba(255,255,255,.45);backdrop-filter:blur(25px);padding:18px 22px;border-radius:30px;min-height:78px;display:flex;align-items:center;gap:14px;text-align:left}
+.lock-avatar{width:46px;height:46px;border-radius:50%;background:#fff;overflow:hidden;flex-shrink:0}
+.unlock{position:absolute;bottom:42px;width:100%;font-size:16px;color:#777;pointer-events:auto}
+.mini-phone-statusbar{position:absolute;top:20px;left:24px;right:24px;height:28px;display:flex;align-items:center;justify-content:space-between;color:#252525;z-index:3;pointer-events:none;font-size:13px;font-weight:600;letter-spacing:1.5px}
+.mini-status-right{display:flex;align-items:center;gap:8px}.mini-battery{width:25px;height:12px;border:1.6px solid currentColor;border-radius:3px;position:relative;padding:1.5px}.mini-battery-level{display:block;width:70%;height:100%;background:currentColor;border-radius:1px}
+.passcode-overlay{position:absolute;inset:0;background:rgba(20,20,20,.6);backdrop-filter:blur(8px);z-index:10;display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff}.passcode-overlay.show{display:flex}
+</style>
+<style id="bb-page2-hero-widget-v391">
+/* 第二页专属 hero 组件：默认隐藏，仅在桌面第二页（page-two-mode）显示 */
+#p2hWrap{display:none}
+html body #desktop.page-two-mode #p2hWrap{
+  display:block;
+  margin:14px 0 18px;
+}
+html body #desktop.page-two-mode .desk-scroll>#clock,
+html body #desktop.page-two-mode .desk-scroll>#desktopNote,
+html body #desktop.page-two-mode .desk-scroll>.avatar-box,
+html body #desktop.page-two-mode .desk-scroll>#deskIns{
+  display:none!important;height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;
+}
+.p2h-battery{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:rgba(255,255,255,.58);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-radius:26px;padding:14px 18px;margin-bottom:12px;color:#222;
+}
+.p2h-battery-label{font-size:15px;font-weight:600;opacity:.92}
+.p2h-battery-pct{font-size:22px;font-weight:800;margin-top:2px}
+.p2h-ring{width:34px;height:34px;transform:rotate(-90deg)}
+.p2h-ring-bg{fill:none;stroke:rgba(34,34,34,.20);stroke-width:3}
+.p2h-ring-fg{fill:none;stroke:#222;stroke-width:3;stroke-linecap:round;stroke-dasharray:100.5;stroke-dashoffset:70;transition:stroke-dashoffset .6s ease}
+.p2h-card{
+  display:flex;align-items:center;gap:14px;
+  background:rgba(255,255,255,.58);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-radius:26px;padding:14px 16px;color:#222;cursor:pointer;
+  transition:background .3s ease;
+}
+.p2h-card.has-message{background:rgba(255,255,255,.62)}
+.p2h-avatar{
+  width:56px;height:56px;border-radius:50%;flex-shrink:0;overflow:hidden;
+  background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:700;color:#222;
+}
+.p2h-avatar img{width:100%;height:100%;object-fit:cover}
+.p2h-mid{flex:1;min-width:0}
+.p2h-preview{
+  font-size:14px;line-height:1.35;opacity:.95;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.p2h-card.has-message .p2h-preview{opacity:1;font-weight:600}
+.p2h-row2{display:flex;align-items:center;gap:10px;margin-top:6px;font-size:12.5px;opacity:.8}
+.p2h-weather{text-align:right;flex-shrink:0}
+.p2h-temp{font-size:22px;font-weight:800}
+.p2h-wtext{font-size:12px;opacity:.85;margin-top:2px}
+
+/* 第二页复古资料卡组件：头像可换、文字可改，不影响第一页与底栏 */
+html body #desktop.page-two-mode .pages-viewport{
+  height:430px!important;
+  min-height:430px!important;
+  overflow:visible!important;
+}
+html body #desktop.page-two-mode .pages-container{
+  height:430px!important;
+  min-height:430px!important;
+  overflow:visible!important;
+}
+html body #desktop.page-two-mode .apps-page.page2-only{
+  grid-auto-flow:row!important;
+  align-content:start!important;
+  height:430px!important;
+  min-height:430px!important;
+  overflow:visible!important;
+  padding-bottom:0!important;
+}
+html body #desktop.page-two-mode .p2-profile-widget{
+  grid-column:1 / -1!important;
+  position:relative!important;
+  width:calc(100% - 8px)!important;
+  min-width:0!important;
+  height:176px!important;
+  margin:4px 4px 0!important;
+  border-radius:25px!important;
+  overflow:hidden!important;
+  color:#555!important;
+  background:
+    radial-gradient(circle at 18px 18px,rgba(255,255,255,.68) 0 3px,transparent 3.5px) 0 0/28px 28px,
+    linear-gradient(180deg,rgba(247,247,247,.95),rgba(233,233,233,.82))!important;
+  border:1px solid rgba(255,255,255,.95)!important;
+  box-shadow:0 10px 26px rgba(55,55,55,.08)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+  backdrop-filter:blur(18px)!important;
+  z-index:22!important;
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+.p2-profile-top{
+  position:relative;
+  z-index:3;
+  height:35px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  background:linear-gradient(180deg,rgba(112,112,112,.62),rgba(100,100,100,.45));
+  border-bottom:1px solid rgba(255,255,255,.66);
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:2px;
+}
+.p2-profile-userdot{
+  position:absolute;
+  left:14px;
+  top:7px;
+  width:21px;
+  height:21px;
+  border-radius:50%;
+  background:rgba(255,255,255,.90);
+  box-shadow:0 1px 5px rgba(0,0,0,.12);
+}
+.p2-profile-userdot::before{
+  content:"";
+  position:absolute;
+  width:7px;
+  height:7px;
+  left:7px;
+  top:4px;
+  border-radius:50%;
+  background:#999;
+}
+.p2-profile-userdot::after{
+  content:"";
+  position:absolute;
+  width:12px;
+  height:6px;
+  left:4.5px;
+  bottom:3px;
+  border-radius:8px 8px 4px 4px;
+  background:#999;
+}
+.p2-profile-spark{position:absolute;right:16px;top:7px;font-size:16px;color:rgba(255,255,255,.86)}
+.p2-profile-handle{
+  position:absolute;
+  z-index:3;
+  left:13px;
+  right:13px;
+  top:43px;
+  height:28px;
+  padding:0 13px;
+  display:flex;
+  align-items:center;
+  border-radius:10px;
+  background:rgba(255,255,255,.90);
+  box-shadow:0 3px 9px rgba(0,0,0,.08);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.35px;
+  color:#8b8b8b;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.p2-profile-main{
+  position:absolute;
+  z-index:3;
+  left:14px;
+  right:14px;
+  top:78px;
+  bottom:25px;
+  display:grid;
+  grid-template-columns:78px 1fr;
+  gap:14px;
+  align-items:center;
+}
+.p2-profile-avatar-btn{
+  width:76px;
+  height:76px;
+  padding:0;
+  border:1px solid rgba(130,130,130,.28);
+  border-radius:12px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.90);
+  box-shadow:0 4px 10px rgba(0,0,0,.10);
+  -webkit-tap-highlight-color:transparent;
+}
+.p2-profile-avatar-btn img{width:100%;height:100%;object-fit:cover;display:block}
+.p2-profile-avatar-placeholder{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-size:31px;font-weight:700;color:#777;background:linear-gradient(145deg,#fff,#ececec)
+}
+.p2-profile-avatar-btn:active{transform:scale(.985);opacity:.88}
+.p2-profile-avatar-input{display:none!important}
+.p2-profile-copy{
+  min-width:0;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:center;
+  position:relative;
+}
+.p2-profile-script{
+  position:absolute;
+  top:-3px;
+  right:4px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-style:italic;
+  font-size:18px;
+  line-height:.9;
+  color:rgba(115,115,115,.50);
+  transform:rotate(-3deg);
+  pointer-events:none;
+}
+.p2-profile-script small{display:block;font-family:Arial,sans-serif;font-style:normal;font-size:7px;letter-spacing:1.4px;text-align:center}
+.p2-profile-meta{
+  margin:18px 0 7px 3px;
+  font-size:7px;
+  letter-spacing:1.1px;
+  color:rgba(95,95,95,.48);
+  pointer-events:none;
+}
+.p2-profile-text-input{
+  width:100%;
+  height:40px;
+  padding:0 12px;
+  border:0;
+  outline:0;
+  border-radius:12px;
+  background:rgba(255,255,255,.92);
+  box-shadow:0 4px 10px rgba(0,0,0,.07);
+  color:#676767;
+  font:inherit;
+  font-size:13px;
+  font-weight:600;
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  -webkit-tap-highlight-color:transparent;
+}
+.p2-profile-footer{
+  position:absolute;
+  z-index:3;
+  left:0;
+  right:0;
+  bottom:0;
+  height:23px;
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  padding:0 14px;
+  color:rgba(255,255,255,.88);
+  background:linear-gradient(180deg,rgba(116,116,116,.48),rgba(92,92,92,.62));
+  border-top:1px solid rgba(255,255,255,.78);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:8px;
+  font-style:italic;
+  letter-spacing:.5px;
+}
+.p2-profile-footer span:nth-child(2){font-family:Arial,sans-serif;font-style:normal;letter-spacing:2px;font-size:8px}
+
+/* 两页必须横向独立，第一页不再露出第二页资料卡 */
+html body #desktop .pages-container{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  width:100%!important;
+  min-width:100%!important;
+}
+html body #desktop .apps-page{
+  flex:0 0 100%!important;
+  width:100%!important;
+  min-width:100%!important;
+  box-sizing:border-box!important;
+}
+html body #desktop:not(.page-two-mode) .apps-page.page2-only{
+  visibility:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+html body #desktop.page-two-mode .apps-page:not(.page2-only){
+  visibility:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+html body #desktop.page-two-mode .apps-page.page2-only{
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+
+/* 卡片文字直接编辑，不再弹系统 prompt */
+.p2-profile-text-input{
+  appearance:none;
+  -webkit-appearance:none;
+  caret-color:#333;
+}
+.p2-profile-text-input[readonly]{cursor:pointer}
+.p2-profile-text-input.is-editing{
+  box-shadow:0 0 0 2px rgba(80,80,80,.15),0 5px 14px rgba(0,0,0,.10)!important;
+  background:rgba(255,255,255,.98)!important;
+}
+.p2-profile-editbar{
+  position:fixed;
+  left:16px;
+  right:16px;
+  bottom:calc(env(safe-area-inset-bottom) + 8px);
+  z-index:10020;
+  height:54px;
+  padding:0 16px;
+  border-radius:28px;
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  background:rgba(250,250,250,.94);
+  border:1px solid rgba(210,210,210,.72);
+  box-shadow:0 8px 28px rgba(0,0,0,.14);
+  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(18px);
+  -webkit-tap-highlight-color:transparent;
+}
+.p2-profile-editbar.is-visible{display:flex}
+.p2-profile-edit-action{
+  width:54px;
+  height:46px;
+  border:0;
+  padding:0;
+  background:transparent;
+  color:#111;
+  font-size:38px;
+  font-weight:800;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  -webkit-tap-highlight-color:transparent;
+}
+.p2-profile-edit-done{margin-left:auto;font-size:42px}
+
+</style>
+<style id="bb-page1-stable-first-paint-v331">
+html body #desktop:not(.page-two-mode) .desk-scroll{padding-top:96px!important;padding-bottom:88px!important}
+html body #desktop:not(.page-two-mode) .desk-scroll>#clock,
+html body #desktop:not(.page-two-mode) .desk-scroll>#desktopNote,
+html body #desktop:not(.page-two-mode) .desk-scroll>.avatar-box,
+html body #desktop:not(.page-two-mode) .desk-scroll>#deskIns{display:none!important;height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
+html body #desktop:not(.page-two-mode) .desk-scroll>#photoWidget.bb-page1-showcase{display:block!important;position:relative!important;width:calc(100% + 14px)!important;max-width:none!important;margin:16px 0 26px -7px!important;padding:0!important;transform:none!important;opacity:1!important;visibility:visible!important;z-index:15!important}
+html body #desktop:not(.page-two-mode) .bb-showcase-shell{width:100%!important;padding:24px 24px 22px!important;border-radius:38px!important}
+html body #desktop:not(.page-two-mode) .bb-showcase-grid>.photo-slot.bb-showcase-photo{height:136px!important;min-height:136px!important}
+html body #desktop:not(.page-two-mode) .pages-viewport{margin-top:0!important}
+html body #desktop:not(.page-two-mode) .apps-page:not(.page2-only){padding-top:44px!important;row-gap:14px!important}
+html body #desktop>.dock,
+html body #desktop .dock{
+  position:absolute!important;
+  left:12px!important;
+  right:12px!important;
+  top:auto!important;
+  bottom:-18px!important;
+  width:auto!important;
+  height:87px!important;
+  margin:0!important;
+  transform:none!important;
+  z-index:80!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-around!important;
+  overflow:visible!important;
+}
+</style>
+<link rel="stylesheet" href="./app.css?v=421">
+<script defer src="./app.js?v=421-image-offload"></script>
+<script defer src="./baobao-v307-drama-lock-persona-fix.js?v=421"></script>
+<script defer src="./baobao-v308-remove-humandna-avatar-page.js?v=421"></script>
+
+
+<style id="bb-chat-message-home-v373">
+#tabChat.bb-message-layout{height:100%;overflow-y:auto;padding:22px 18px 112px;background:#f7f7f7;-webkit-overflow-scrolling:touch}
+#tabChat.bb-message-layout .bb-message-header{display:flex;align-items:center;justify-content:space-between;margin:2px 0 18px}
+#tabChat.bb-message-layout .bb-message-title{font-size:34px;line-height:1;font-weight:900;letter-spacing:-1.2px;color:#101954}
+#tabChat.bb-message-layout .bb-message-icon-btn{width:42px;height:42px;border-radius:14px;border:1px solid #e7e7eb;background:#fff;display:flex;align-items:center;justify-content:center;color:#1a1a1a;box-shadow:0 6px 18px rgba(20,20,20,.04)}
+#tabChat.bb-message-layout .bb-message-icon-btn svg{width:22px;height:22px}
+#tabChat.bb-message-layout .bb-message-tabs{display:flex;gap:22px;padding:0 2px 10px;margin:0 0 16px;color:#9b9ba3;font-size:15px;border-bottom:1px solid #ececf1;overflow-x:auto;white-space:nowrap}
+#tabChat.bb-message-layout .bb-message-tabs .active{color:#1f1f24;font-weight:700;position:relative}
+#tabChat.bb-message-layout .bb-message-tabs .active::after{content:"";position:absolute;left:0;right:0;bottom:-11px;height:2px;border-radius:999px;background:#1f1f24}
+#tabChat.bb-message-layout .bb-private-works-bar{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #ececf1;border-radius:12px;padding:12px 14px;margin-bottom:14px;color:#7e7e88;font-size:14px}
+#tabChat.bb-message-layout .bb-private-works-left{display:flex;align-items:center;gap:8px;font-weight:600}
+#tabChat.bb-message-layout .bb-private-lock{font-size:12px;opacity:.85}
+#tabChat.bb-message-layout .bb-private-works-right{font-size:13px;color:#9e9ea8}
+#tabChat.bb-message-layout .bb-message-gallery{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+#tabChat.bb-message-layout .bb-message-gallery-left{display:grid;grid-template-rows:1fr 1fr;gap:10px}
+#tabChat.bb-message-layout .bb-msg-photo{position:relative;min-height:128px;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,#e9e9ee,#dcdce4);box-shadow:inset 0 0 0 1px rgba(255,255,255,.75);cursor:pointer;background-size:cover;background-position:center}
+#tabChat.bb-message-layout .bb-msg-photo.bb-msg-photo-large{min-height:266px}
+#tabChat.bb-message-layout .bb-msg-photo::before{content:"点击换图";position:absolute;inset:auto 10px 10px auto;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.88);color:#7f7f89;font-size:11px;font-weight:700;letter-spacing:.2px;z-index:2}
+#tabChat.bb-message-layout .bb-msg-photo.has-image::before{content:"换图"}
+#tabChat.bb-message-layout .bb-msg-photo.empty::after{content:"＋";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:300;color:#ffffffd8;text-shadow:0 1px 2px rgba(0,0,0,.08)}
+#tabChat.bb-message-layout .bb-msg-photo-meta{position:absolute;left:0;right:0;bottom:0;padding:12px 12px 10px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.36));color:#fff}
+#tabChat.bb-message-layout .bb-msg-photo-title{font-size:13px;font-weight:700;line-height:1.2;word-break:break-all}
+#tabChat.bb-message-layout .bb-msg-photo-sub{font-size:11px;opacity:.88;margin-top:5px}
+#tabChat.bb-message-layout .bb-open-question{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 12px;margin-bottom:8px;font-size:17px;color:#19191c;font-weight:600}
+#tabChat.bb-message-layout .bb-open-question strong{font-size:18px;letter-spacing:.5px}
+#tabChat.bb-message-layout .bb-chat-self-row{display:flex;align-items:center;gap:12px;padding:10px 0 14px;border-bottom:1px solid #f0f0f3;margin-bottom:10px}
+#tabChat.bb-message-layout .bb-chat-self-avatar{width:56px;height:56px;border-radius:50%;overflow:hidden;background:#ededf0;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+#tabChat.bb-message-layout .bb-chat-self-avatar img{width:100%;height:100%;object-fit:cover}
+#tabChat.bb-message-layout .bb-chat-self-info{flex:1;min-width:0}
+#tabChat.bb-message-layout .bb-chat-self-top{font-size:17px;font-weight:800;color:#15151a;display:flex;align-items:center;gap:8px}
+#tabChat.bb-message-layout .bb-chat-self-count{font-size:13px;color:#a5a5ae;font-weight:700}
+#tabChat.bb-message-layout .bb-chat-self-handle{font-size:13px;color:#b2b2bb;margin-top:4px}
+#tabChat.bb-message-layout .bb-chat-self-bio{font-size:12px;color:#d0d0d7;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tabChat.bb-message-layout .bb-chat-self-time{font-size:12px;color:#b9b9c1;align-self:flex-start;padding-top:3px}
+#tabChat.bb-message-layout .bb-message-section-title{display:flex;align-items:center;gap:3px;font-size:17px;font-weight:800;color:#232327;margin:2px 0 8px}
+#tabChat.bb-message-layout #chatRecentList.bb-chat-home-list{display:flex;flex-direction:column;gap:12px;padding-bottom:10px}
+#tabChat.bb-message-layout #chatRecentList .chat-recent-empty{background:#fff;border-radius:16px;padding:18px;text-align:center;color:#aaaab3;font-size:14px}
+#tabChat.bb-message-layout #chatRecentList .chat-recent-item{display:flex;align-items:flex-start;gap:12px;padding:8px 0;background:transparent!important;border:none!important;box-shadow:none!important}
+#tabChat.bb-message-layout #chatRecentList .chat-recent-avatar{width:52px;height:52px;border-radius:12px;background:#ececf0;overflow:hidden;flex-shrink:0}
+#tabChat.bb-message-layout #chatRecentList .chat-recent-avatar img{width:100%;height:100%;object-fit:cover}
+#tabChat.bb-message-layout #chatRecentList .chat-recent-info{min-width:0;flex:1}
+#tabChat.bb-message-layout #chatRecentList .chat-recent-name{font-size:17px;font-weight:700;color:#1d1d23;line-height:1.25}
+#tabChat.bb-message-layout #chatRecentList .chat-recent-last{font-size:13px;color:#b6b6bf;line-height:1.45;margin-top:4px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+</style>
+
+
+<style id="bb-chat-overlay-fix-v374">
+/* 修复 Chat 首页像套了一层小手机：强制作为贴边全屏应用层显示 */
+#chatDemo.chat-demo{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  background:#f7f7f7!important;
+  border-radius:0!important;
+  overflow:hidden!important;
+  z-index:1200!important;
+}
+#chatDemo .chat-plus-menu{z-index:20}
+#chatDemo .app-tab-content{
+  position:absolute!important;
+  inset:0 0 86px 0!important;
+  display:none;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  background:#f7f7f7!important;
+}
+#chatDemo .app-tab-content.active,
+#chatDemo .app-tab-content.bb-active,
+#chatDemo .app-tab-content[data-active="true"]{
+  display:block;
+}
+#chatDemo #tabChat{display:block;}
+#chatDemo .app-tabbar{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  height:86px!important;
+  display:grid!important;
+  grid-template-columns:repeat(4,1fr)!important;
+  align-items:center!important;
+  background:rgba(255,255,255,.96)!important;
+  border-top:1px solid #ececf1!important;
+  box-shadow:0 -8px 20px rgba(0,0,0,.03)!important;
+  z-index:5!important;
+}
+#chatDemo .app-tabbar-item{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  height:100%!important;
+  font-size:14px!important;
+  font-weight:600!important;
+  color:#a0a0a8!important;
+}
+#chatDemo .app-tabbar-item.active{color:#1f1f24!important;font-weight:800!important;}
+#chatDemo.bb-chat-room-open{display:none!important;}
+</style>
+
+
+<style id="bb-chat-polish-v376">
+/* Chat 首页：稳定一点，顶部仍保留很轻的磨砂感。 */
+#chatDemo #tabChat.bb-message-layout{
+  position:absolute!important;
+  isolation:isolate;
+  overflow-x:hidden!important;
+  overscroll-behavior-y:contain;
+  background:
+    linear-gradient(180deg,rgba(247,247,247,.88) 0,rgba(247,247,247,.97) 138px,#f7f7f7 212px)!important;
+}
+#chatDemo #tabChat.bb-message-layout::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  pointer-events:none;
+  left:-10%;
+  right:-10%;
+  top:-36px;
+  height:190px;
+  background:
+    radial-gradient(circle at 20% 36%,rgba(184,188,203,.20),rgba(184,188,203,0) 42%),
+    radial-gradient(circle at 74% 18%,rgba(213,210,220,.18),rgba(213,210,220,0) 46%),
+    radial-gradient(circle at 50% 70%,rgba(232,233,238,.50),rgba(232,233,238,0) 58%);
+  filter:blur(22px);
+  -webkit-filter:blur(22px);
+  opacity:.62;
+}
+#chatDemo #tabChat.bb-message-layout .bb-message-header{
+  position:relative;
+  z-index:2;
+}
+#chatDemo #tabChat.bb-message-layout .bb-message-back{
+  border:none!important;
+  background:transparent!important;
+  padding:0!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:4px!important;
+  cursor:pointer!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+#chatDemo #tabChat.bb-message-layout .bb-message-back:active{
+  opacity:.72;
+  transform:translateY(1px);
+}
+/* 图片仍然整块可点换图，但不再显示“换图”胶囊文字。 */
+#chatDemo #tabChat.bb-message-layout .bb-msg-photo::before,
+#chatDemo #tabChat.bb-message-layout .bb-msg-photo.has-image::before{
+  content:none!important;
+  display:none!important;
+}
+/* “新对话·是否展开” 上方做一点点边界磨砂，别太重。 */
+#chatDemo #tabChat.bb-message-layout .bb-open-question{
+  position:relative;
+  padding-top:16px;
+  margin-top:2px;
+}
+#chatDemo #tabChat.bb-message-layout .bb-open-question::before{
+  content:"";
+  position:absolute;
+  left:-8px;
+  right:-8px;
+  top:-18px;
+  height:28px;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(247,247,247,.16),rgba(247,247,247,.58) 48%,rgba(247,247,247,.96) 100%);
+  -webkit-backdrop-filter:blur(5px);
+  backdrop-filter:blur(5px);
+}
+/* “新建聊天室”仅作版面装饰：吃掉点击，避免穿透到桌面世界书。 */
+#chatDemo #tabChat.bb-message-layout .bb-chat-self-row{
+  position:relative!important;
+  z-index:8!important;
+  pointer-events:auto!important;
+  cursor:default!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  -webkit-tap-highlight-color:transparent!important;
+  touch-action:pan-y!important;
+}
+#chatDemo #tabChat.bb-message-layout .bb-chat-self-row *{
+  pointer-events:none!important;
+}
+#chatDemo #tabChat.bb-message-layout .bb-chat-self-avatar{
+  cursor:default!important;
+}
+</style>
+
+<style id="bb-v378-no-black-square-final">
+/* 378：只关闭 iOS 原生按压黑框，不改按钮位置、尺寸或页面层级。 */
+html body .phone,
+html body .phone *{
+  -webkit-tap-highlight-color:rgba(0,0,0,0)!important;
+}
+html body #desktop .apps-page>.app,
+html body #desktop .apps-page>.app:active,
+html body #desktop .apps-page>.app:focus,
+html body #desktop .apps-page>.app:focus-visible,
+html body #desktop .apps-page>.app .icon,
+html body #desktop .apps-page>.app .icon:active,
+html body #desktop .dock>.dock-icon,
+html body #desktop .dock>.dock-icon:active,
+html body #desktop .dock>.dock-icon:focus{
+  outline:none!important;
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-touch-callout:none!important;
+  -webkit-user-select:none!important;
+  user-select:none!important;
+  -webkit-user-drag:none!important;
+}
+html body #desktop .apps-page>.app::before,
+html body #desktop .apps-page>.app::after,
+html body #desktop .dock>.dock-icon::before,
+html body #desktop .dock>.dock-icon::after{
+  content:none!important;
+  display:none!important;
+}
+</style>
+
+
+<style id="bb-chat-subpage-front-v379">
+/* 只让聊天里的真实子页面盖在聊天室上面，不改按钮尺寸、背景和按压效果。 */
+#personaSelectPanel,#friendSearchPanel,#personaArchive,#textEdit,#modal,
+#favoriteMsgOverlay,#chatSettingsPanel,#dualAvatarPanel,#personaDebugPage,#dataManagerPage,#momentsSubpanel{
+  z-index:6200!important;
+  pointer-events:auto!important;
+}
+#bbToolBackdrop{z-index:6240!important;pointer-events:auto!important;}
+#bbToolSheet{z-index:6241!important;pointer-events:auto!important;}
+#bbToolModal{z-index:6250!important;pointer-events:auto!important;}
+#bbStickerPicker{z-index:6260!important;pointer-events:auto!important;}
+#bbTimestampMask,#bbBlacklistMask{z-index:6265!important;pointer-events:auto!important;}
+#innerVoiceOverlay,#msgEditOverlay{z-index:6270!important;pointer-events:auto!important;}
+</style>
+
+<style id="bugfix-hidden-panels-v403">
+/* ===================================================================
+   修复：以下这些功能面板（反侦察 / 记忆总结 / Human DNA / 微信资料编辑 /
+   转账详情 / 工具弹窗 / 消息编辑与右键菜单 / 查手机小程序 等）
+   此前完全没有对应的 CSS，导致默认就以普通文档流显示、常驻占屏，
+   把锁屏、桌面、聊天等界面上的按钮全部遮住、劫持点击。
+   这里统一补上"默认隐藏 + .show 才显示"的规则，且不影响原有逻辑。
+   =================================================================== */
+
+/* ---- 全屏页面型面板：默认隐藏，出现时整屏覆盖 ---- */
+.ar-overlay,
+.ar2-overlay,
+.ar2-settings,
+.ar3-night,
+.ar3-log,
+.memv1-panel,
+.hdna-overlay,
+.wechat-profile-editor,
+.moments-publisher,
+#momentsSubpanel{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6200;
+  background:#fff;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.ar-overlay.show,
+.ar2-overlay.show,
+.ar2-settings.show,
+.ar3-night.show,
+.ar3-log.show,
+.memv1-panel.show,
+.hdna-overlay.show,
+.wechat-profile-editor.show,
+.moments-publisher.show,
+#momentsSubpanel.show{
+  display:block;
+}
+
+/* ---- 居中弹窗型蒙层（转账详情 / 工具弹窗 / 各类结果卡片） ---- */
+.bb-transfer-detail-mask,
+.bb-tool-modal,
+.ar2-result,
+.msg-edit-overlay,
+.inner-voice-overlay,
+#bbStickerPicker{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6210;
+  background:rgba(0,0,0,.5);
+  align-items:center;
+  justify-content:center;
+}
+.bb-transfer-detail-mask.show,
+.bb-tool-modal.show,
+.ar2-result.show,
+.msg-edit-overlay.show,
+.inner-voice-overlay.show,
+#bbStickerPicker.show{
+  display:flex;
+}
+.bb-transfer-detail,
+.ar2-result-card{
+  background:#fff;border-radius:16px;padding:20px;width:80%;max-width:320px;text-align:center;box-sizing:border-box;
+}
+
+/* ---- 底部弹出式蒙层（时间戳/黑名单设置、记忆手动添加、查手机设置） ---- */
+.bb-sheet-mask,
+.memv1-addsheet,
+.bbspa-settings-sheet{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6265;
+  background:rgba(0,0,0,.5);
+  align-items:flex-end;
+  justify-content:center;
+}
+.bb-sheet-mask.show,
+.memv1-addsheet.show,
+.bbspa-settings-sheet.show{
+  display:flex;
+}
+.bb-sheet,
+.memv1-sheet,
+.bbspa-settings-card{
+  background:#fff;border-radius:16px 16px 0 0;padding:16px;width:100%;max-width:420px;box-sizing:border-box;
+}
+
+/* ---- ar-overlay 内部的分阶段全屏子卡片（默认隐藏，show 时铺满父容器） ---- */
+.ar-request,
+.ar-session,
+.ar-result{
+  display:none;
+  position:absolute;
+  inset:0;
+  z-index:2;
+  background:#fff;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  box-sizing:border-box;
+}
+.ar-request.show,
+.ar-session.show,
+.ar-result.show{
+  display:flex;
+}
+.ar-result-card{
+  background:#fff;border-radius:16px;padding:20px;width:100%;max-width:320px;text-align:center;box-sizing:border-box;
+}
+
+/* ---- ar3-night 内部的"解锁成功"浮层 ---- */
+.ar3-shadow{
+  display:none;
+  position:absolute;
+  inset:0;
+  z-index:2;
+  background:rgba(0,0,0,.6);
+  align-items:center;
+  justify-content:center;
+}
+.ar3-shadow.show{display:flex}
+.ar3-shadow-card{
+  background:#fff;border-radius:16px;padding:20px;width:80%;max-width:320px;text-align:center;color:#000;box-sizing:border-box;
+}
+
+/* ---- 顶部悬浮通知条（异常使用记录提醒） ---- */
+.ar3-notice{
+  display:none;
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  top:calc(env(safe-area-inset-top) + 54px);
+  z-index:6300;
+  width:88%;
+  max-width:360px;
+  background:rgba(255,255,255,.97);
+  border-radius:14px;
+  box-shadow:0 6px 24px rgba(0,0,0,.2);
+  padding:12px;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  box-sizing:border-box;
+}
+.ar3-notice.show{display:flex}
+
+/* ---- 抢手机按钮：默认隐藏，危险内容出现时才短暂展示 ---- */
+.ar2-grab,
+.ar-grab{
+  display:none;
+}
+.ar2-grab.show,
+.ar-grab.show{
+  display:inline-block;
+}
+
+/* ---- bbspa 查手机小程序：聊天视图与列表视图二选一显示 ---- */
+.bbspa-chat{
+  display:none;
+  flex-direction:column;
+  height:100%;
+  box-sizing:border-box;
+}
+.bbspa-chat.show{display:flex}
+
+/* ---- Human DNA 内的"开发者层"隐藏区块 ---- */
+.hdna-dev{display:none}
+.hdna-dev.show{display:block}
+
+/* ---- 消息右键菜单 / 引用回复条 / 关闭菜单用的透明背景 ---- */
+.msg-context-backdrop{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6280;
+  background:transparent;
+}
+.msg-context-backdrop.show{display:block}
+.msg-context-menu{
+  display:none;
+  position:fixed;
+  z-index:6290;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,.25);
+  overflow:hidden;
+}
+.msg-context-menu.show{display:block}
+.msg-quote-bar{
+  display:none;
+  align-items:center;
+  box-sizing:border-box;
+}
+.msg-quote-bar.show{display:flex}
+
+/* ---- 核心设置体系：设置/API配置/聊天背景/人设档案/双头像/开发者页 等
+   这些面板用的是 openPanel()/closePanel() 直接改 inline style.display 来开关，
+   但 .panel 这个类此前完全没有 CSS，默认就以 block 常驻显示。
+   这里补上默认隐藏；inline style 会在打开时覆盖这条默认规则，不影响原有开关逻辑。 ---- */
+.panel{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6200;
+  background:#fff;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  box-sizing:border-box;
+}
+
+/* ---- 工具箱（+号弹出的功能格子）与图片查看器 ---- */
+.bb-tool-backdrop,
+#bbMediaViewerV212{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6240;
+  background:rgba(0,0,0,.5);
+  align-items:center;
+  justify-content:center;
+}
+.bb-tool-backdrop.show,
+#bbMediaViewerV212.show{display:flex}
+.bb-tool-sheet{
+  display:none;
+  position:fixed;
+  left:0;right:0;bottom:0;
+  z-index:6241;
+  background:#fff;
+  border-radius:16px 16px 0 0;
+  box-sizing:border-box;
+  max-height:70vh;
+  overflow-y:auto;
+}
+.bb-tool-sheet.show{display:block}
+
+/* ---- 查手机小程序容器：用 inline style 控制显示（默认隐藏） ---- */
+#bbSubjectAppPanel{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6205;
+  background:#fff;
+}
+
+/* ---- "正在识别表情包含义…" 小提示条 ---- */
+.bb-sticker-recognizing{
+  display:none;
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:calc(env(safe-area-inset-bottom) + 90px);
+  z-index:6300;
+  background:rgba(0,0,0,.72);
+  color:#fff;
+  font-size:13px;
+  padding:8px 14px;
+  border-radius:20px;
+  box-sizing:border-box;
+}
+.bb-sticker-recognizing.show{display:block}
+</style>
+
+
+<style id="bugfix-hidden-panels-v403">
+/* ===================================================================
+   修复：以下这些功能面板（反侦察 / 记忆总结 / Human DNA / 微信资料编辑 /
+   转账详情 / 工具弹窗 / 消息编辑与右键菜单 / 查手机小程序 等）
+   此前完全没有对应的 CSS，导致默认就以普通文档流显示、常驻占屏，
+   把锁屏、桌面、聊天等界面上的按钮全部遮住、劫持点击。
+   这里统一补上"默认隐藏 + .show 才显示"的规则，且不影响原有逻辑。
+   =================================================================== */
+
+/* ---- 全屏页面型面板：默认隐藏，出现时整屏覆盖 ---- */
+.ar-overlay,
+.ar2-overlay,
+.ar2-settings,
+.ar3-night,
+.ar3-log,
+.memv1-panel,
+.hdna-overlay,
+.wechat-profile-editor,
+.moments-publisher,
+#momentsSubpanel{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6200;
+  background:#fff;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.ar-overlay.show,
+.ar2-overlay.show,
+.ar2-settings.show,
+.ar3-night.show,
+.ar3-log.show,
+.memv1-panel.show,
+.hdna-overlay.show,
+.wechat-profile-editor.show,
+.moments-publisher.show,
+#momentsSubpanel.show{
+  display:block;
+}
+
+/* ---- 居中弹窗型蒙层（转账详情 / 工具弹窗 / 各类结果卡片） ---- */
+.bb-transfer-detail-mask,
+.bb-tool-modal,
+.ar2-result,
+.msg-edit-overlay,
+.inner-voice-overlay,
+#bbStickerPicker{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6210;
+  background:rgba(0,0,0,.5);
+  align-items:center;
+  justify-content:center;
+}
+.bb-transfer-detail-mask.show,
+.bb-tool-modal.show,
+.ar2-result.show,
+.msg-edit-overlay.show,
+.inner-voice-overlay.show,
+#bbStickerPicker.show{
+  display:flex;
+}
+.bb-transfer-detail,
+.ar2-result-card{
+  background:#fff;border-radius:16px;padding:20px;width:80%;max-width:320px;text-align:center;box-sizing:border-box;
+}
+
+/* ---- 底部弹出式蒙层（时间戳/黑名单设置、记忆手动添加、查手机设置） ---- */
+.bb-sheet-mask,
+.memv1-addsheet,
+.bbspa-settings-sheet{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6265;
+  background:rgba(0,0,0,.5);
+  align-items:flex-end;
+  justify-content:center;
+}
+.bb-sheet-mask.show,
+.memv1-addsheet.show,
+.bbspa-settings-sheet.show{
+  display:flex;
+}
+.bb-sheet,
+.memv1-sheet,
+.bbspa-settings-card{
+  background:#fff;border-radius:16px 16px 0 0;padding:16px;width:100%;max-width:420px;box-sizing:border-box;
+}
+
+/* ---- ar-overlay 内部的分阶段全屏子卡片（默认隐藏，show 时铺满父容器） ---- */
+.ar-request,
+.ar-session,
+.ar-result{
+  display:none;
+  position:absolute;
+  inset:0;
+  z-index:2;
+  background:#fff;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  box-sizing:border-box;
+}
+.ar-request.show,
+.ar-session.show,
+.ar-result.show{
+  display:flex;
+}
+.ar-result-card{
+  background:#fff;border-radius:16px;padding:20px;width:100%;max-width:320px;text-align:center;box-sizing:border-box;
+}
+
+/* ---- ar3-night 内部的"解锁成功"浮层 ---- */
+.ar3-shadow{
+  display:none;
+  position:absolute;
+  inset:0;
+  z-index:2;
+  background:rgba(0,0,0,.6);
+  align-items:center;
+  justify-content:center;
+}
+.ar3-shadow.show{display:flex}
+.ar3-shadow-card{
+  background:#fff;border-radius:16px;padding:20px;width:80%;max-width:320px;text-align:center;color:#000;box-sizing:border-box;
+}
+
+/* ---- 顶部悬浮通知条（异常使用记录提醒） ---- */
+.ar3-notice{
+  display:none;
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  top:calc(env(safe-area-inset-top) + 54px);
+  z-index:6300;
+  width:88%;
+  max-width:360px;
+  background:rgba(255,255,255,.97);
+  border-radius:14px;
+  box-shadow:0 6px 24px rgba(0,0,0,.2);
+  padding:12px;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  box-sizing:border-box;
+}
+.ar3-notice.show{display:flex}
+
+/* ---- 抢手机按钮：默认隐藏，危险内容出现时才短暂展示 ---- */
+.ar2-grab,
+.ar-grab{
+  display:none;
+}
+.ar2-grab.show,
+.ar-grab.show{
+  display:inline-block;
+}
+
+/* ---- bbspa 查手机小程序：聊天视图与列表视图二选一显示 ---- */
+.bbspa-chat{
+  display:none;
+  flex-direction:column;
+  height:100%;
+  box-sizing:border-box;
+}
+.bbspa-chat.show{display:flex}
+
+/* ---- Human DNA 内的"开发者层"隐藏区块 ---- */
+.hdna-dev{display:none}
+.hdna-dev.show{display:block}
+
+/* ---- 消息右键菜单 / 引用回复条 / 关闭菜单用的透明背景 ---- */
+.msg-context-backdrop{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6280;
+  background:transparent;
+}
+.msg-context-backdrop.show{display:block}
+.msg-context-menu{
+  display:none;
+  position:fixed;
+  z-index:6290;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,.25);
+  overflow:hidden;
+}
+.msg-context-menu.show{display:block}
+.msg-quote-bar{
+  display:none;
+  align-items:center;
+  box-sizing:border-box;
+}
+.msg-quote-bar.show{display:flex}
+
+/* ---- 核心设置体系：设置/API配置/聊天背景/人设档案/双头像/开发者页 等
+   这些面板用的是 openPanel()/closePanel() 直接改 inline style.display 来开关，
+   但 .panel 这个类此前完全没有 CSS，默认就以 block 常驻显示。
+   这里补上默认隐藏；inline style 会在打开时覆盖这条默认规则，不影响原有开关逻辑。 ---- */
+.panel{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6200;
+  background:#fff;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  box-sizing:border-box;
+}
+
+/* ---- 工具箱（+号弹出的功能格子）与图片查看器 ---- */
+.bb-tool-backdrop,
+#bbMediaViewerV212{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6240;
+  background:rgba(0,0,0,.5);
+  align-items:center;
+  justify-content:center;
+}
+.bb-tool-backdrop.show,
+#bbMediaViewerV212.show{display:flex}
+.bb-tool-sheet{
+  display:none;
+  position:fixed;
+  left:0;right:0;bottom:0;
+  z-index:6241;
+  background:#fff;
+  border-radius:16px 16px 0 0;
+  box-sizing:border-box;
+  max-height:70vh;
+  overflow-y:auto;
+}
+.bb-tool-sheet.show{display:block}
+
+/* ---- 查手机小程序容器：用 inline style 控制显示（默认隐藏） ---- */
+#bbSubjectAppPanel{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:6205;
+  background:#fff;
+}
+
+/* ---- "正在识别表情包含义…" 小提示条 ---- */
+.bb-sticker-recognizing{
+  display:none;
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:calc(env(safe-area-inset-bottom) + 90px);
+  z-index:6300;
+  background:rgba(0,0,0,.72);
+  color:#fff;
+  font-size:13px;
+  padding:8px 14px;
+  border-radius:20px;
+  box-sizing:border-box;
+}
+.bb-sticker-recognizing.show{display:block}
+
+/* ---- 聊天室"新建聊天"欢迎页(chatDemo)与聊天室本体(chatRoom)：
+   这两个屏幕通过 element.style.display 直接控制显示/隐藏，
+   但默认(未设置 inline style 时)缺少隐藏规则，导致内容常驻显示、
+   漏到桌面等其他屏幕上方。这里补上默认隐藏；
+   已有的 openXxx/closeXxx 函数通过 inline style 控制显示，
+   会自动覆盖这条默认规则，不影响原有逻辑。 ---- */
+#chatDemo{display:none}
+#chatRoom{display:none}
+</style>
+
+
+<style id="bb-pwa-swipe-guard-v412">
+html,body{overscroll-behavior-x:none!important;-webkit-overflow-scrolling:touch;}
+html.bb-standalone-v412,html.bb-standalone-v412 body{width:100%!important;max-width:100vw!important;overflow:hidden!important;background:#000!important;}
+html.bb-standalone-v412 .phone,html.bb-standalone-v412 .screen,html.bb-standalone-v412 #desktop{max-width:100vw!important;overflow-x:hidden!important;overscroll-behavior-x:none!important;}
+html.bb-standalone-v412 #desktop,html.bb-standalone-v412 #desktop .pages-viewport,html.bb-standalone-v412 #desktop .pages-container{touch-action:none!important;-webkit-user-select:none!important;user-select:none!important;}
+</style>
+
+<style id="bb-page2-bottom-widgets-visible-final-v412">
+/* 第二页底部两个组件完整显示：覆盖旧的 overflow:hidden 裁切规则 */
+html body #desktop.page-two-mode .desk-scroll{
+  overflow:visible!important;
+}
+html body #desktop.page-two-mode .pages-viewport,
+html body #desktop.page-two-mode .pages-container,
+html body #desktop.page-two-mode .apps-page.page2-only{
+  overflow:visible!important;
+}
+html body #desktop.page-two-mode .p2-bottom-widgets{
+  z-index:500!important;
+  overflow:visible!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-card,
+html body #desktop.page-two-mode .p2-mini-song-card{
+  z-index:501!important;
+  overflow:visible!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+html body #desktop.page-two-mode .dock{
+  z-index:700!important;
+}
+</style>
+</head>
+<body><div id="bbBootMarkV288" style="position:fixed;left:-9999px" aria-hidden="true">288</div>
+<div class="phone">
+
+<div class="baobao-message-banner" id="baobaoMessageBanner" aria-live="polite">
+  <div class="baobao-message-banner-avatar" id="baobaoMessageBannerAvatar">豹</div>
+  <div class="baobao-message-banner-main">
+    <div class="baobao-message-banner-head">
+      <span class="baobao-message-banner-name" id="baobaoMessageBannerName">新消息</span>
+      <span class="baobao-message-banner-time">现在</span>
+    </div>
+    <div class="baobao-message-banner-text" id="baobaoMessageBannerText"></div>
+  </div>
+  <div class="baobao-message-banner-count" id="baobaoMessageBannerCount">2</div>
+</div>
+
+
+<div class="mini-phone-statusbar" id="miniPhoneStatusbar">
+  <span class="mini-status-time" id="miniStatusTime">00:00</span>
+  <span class="mini-status-right">
+    <span class="mini-signal">5G</span>
+    <span class="mini-battery"><span class="mini-battery-level"></span></span>
+  </span>
+</div>
+
+
+<div class="screen lock" id="lock">
+
+<div class="time" id="lockTime">00:00</div>
+
+
+
+<div class="lock-card">
+<div class="lock-avatar" id="lockAvatar"></div>
+<div><span id="lockName"></span><br><small></small></div>
+</div>
+
+<div class="unlock">↑ 上划解锁</div>
+
+<div class="passcode-overlay" id="passcodeOverlay">
+<div class="passcode-title">输入密码</div>
+<div class="passcode-dots" id="passcodeDots">
+<span class="passcode-dot"></span><span class="passcode-dot"></span><span class="passcode-dot"></span><span class="passcode-dot"></span>
+</div>
+<div class="passcode-keys">
+<div class="passcode-key" onclick="passcodeInput('1')">1</div>
+<div class="passcode-key" onclick="passcodeInput('2')">2</div>
+<div class="passcode-key" onclick="passcodeInput('3')">3</div>
+<div class="passcode-key" onclick="passcodeInput('4')">4</div>
+<div class="passcode-key" onclick="passcodeInput('5')">5</div>
+<div class="passcode-key" onclick="passcodeInput('6')">6</div>
+<div class="passcode-key" onclick="passcodeInput('7')">7</div>
+<div class="passcode-key" onclick="passcodeInput('8')">8</div>
+<div class="passcode-key" onclick="passcodeInput('9')">9</div>
+<div class="passcode-key passcode-cancel-key" onclick="hidePasscodePad(event)">取消</div>
+<div class="passcode-key" onclick="passcodeInput('0')">0</div>
+<div class="passcode-key" onclick="passcodeBackspace()">⌫</div>
+</div>
+<div class="passcode-cancel" style="display:none" onclick="hidePasscodePad(event)">取消</div>
+</div>
+
+</div>
+
+<div class="screen desktop hidden" id="desktop">
+<div class="dynamic"></div>
+<div class="desk-scroll">
+
+<div class="time" id="clock">00:00</div>
+
+<div class="desktop-note" id="desktopNote" contenteditable="true" spellcheck="false" onblur="saveDesktopNote()">
+СИСТЕМА АКТИВНА<br>
+СОЕДИНЕНИЕ СТАБИЛЬНО
+</div>
+
+<div class="widget avatar-box">
+<div class="avatar" id="deskAvatar" onclick="triggerAvatarUpload(event)"></div>
+<div onclick="editDesktopProfile()"><div class="name" id="deskName"></div><div class="small" id="deskStatus">点击设置个人资料</div></div>
+</div>
+
+<div class="widget ins" id="deskIns" onclick="editIns()"> I ENJOY LIFE NOW <br>YOUR DIGITAL SPACE</div>
+
+<div class="p2h-wrap" id="p2hWrap">
+  <div class="p2h-battery" id="p2hBattery" style="display:none">
+    <div class="p2h-battery-text">
+      <div class="p2h-battery-label" id="p2hBatteryLabel">充电中</div>
+      <div class="p2h-battery-pct" id="p2hBatteryPct">--%</div>
+    </div>
+    <svg class="p2h-ring" viewBox="0 0 40 40">
+      <circle class="p2h-ring-bg" cx="20" cy="20" r="16"/>
+      <circle class="p2h-ring-fg" id="p2hRingFg" cx="20" cy="20" r="16"/>
+    </svg>
+  </div>
+  <div class="p2h-card" id="p2hCard" onclick="window.openIncomingConversation&&window.openIncomingConversation()">
+    <div class="p2h-avatar" id="p2hAvatar"></div>
+    <div class="p2h-mid">
+      <div class="p2h-preview" id="p2hPreview">今天也要元气满满 ⋆｡°✩</div>
+      <div class="p2h-row2">
+        <span class="p2h-date" id="p2hDate">--月--日</span>
+        <span class="p2h-week" id="p2hWeek">--</span>
+      </div>
+    </div>
+    <div class="p2h-weather" id="p2hWeather" style="display:none">
+      <div class="p2h-temp" id="p2hTemp">--°</div>
+      <div class="p2h-wtext" id="p2hWtext"></div>
+    </div>
+  </div>
+</div>
+
+<div class="pages-viewport">
+<div class="pages-container" id="pagesContainer"></div>
+</div>
+
+<div class="photo-widget bb-page1-showcase" id="photoWidget">
+  <div class="bb-showcase-shell">
+    <div class="bb-showcase-head">
+      <div class="bb-showcase-left">
+        <label class="memory-top-avatar bb-showcase-avatar" id="memoryTopAvatar" for="memoryAvatarInput"></label>
+        <div class="bb-showcase-avatar-tip">✎</div>
+      </div>
+      <div class="bb-showcase-titlebox">
+        <div class="bb-showcase-line1">
+          <div class="bb-showcase-temp" id="showcaseTemp" contenteditable="true" spellcheck="false" onblur="saveShowcaseText()">5℃</div>
+          <div class="bb-showcase-title" id="showcaseTitle" contenteditable="true" spellcheck="false" onblur="saveShowcaseText()">MEMORY TRACE</div>
+        </div>
+        <div class="bb-showcase-sub" id="showcaseSub" contenteditable="true" spellcheck="false" onblur="saveShowcaseText()">记录今天想保存的小碎片</div>
+      </div>
+      <div class="bb-showcase-date" id="showcaseDate" contenteditable="true" spellcheck="false" onblur="saveShowcaseText()">07-22</div>
+    </div>
+    <div class="bb-showcase-grid">
+      <div class="photo-slot bb-showcase-photo" onclick="triggerMemoryPhoto(0)">＋<span>照片 1</span></div>
+      <div class="photo-slot bb-showcase-photo" onclick="triggerMemoryPhoto(1)">＋<span>照片 2</span></div>
+      <div class="photo-slot bb-showcase-photo" onclick="triggerMemoryPhoto(2)">＋<span>照片 3</span></div>
+    </div>
+    <div class="bb-showcase-footer">
+      <div class="bb-showcase-pill"></div>
+      <div class="bb-showcase-actions">
+        <button type="button" class="bb-showcase-action" onclick="cycleShowcaseIcon(event,'heart')">♡</button>
+        <button type="button" class="bb-showcase-action" onclick="cycleShowcaseIcon(event,'lock')">⌂</button>
+        <button type="button" class="bb-showcase-action" onclick="cycleShowcaseIcon(event,'star')">★</button>
+      </div>
+    </div>
+  </div>
+  <input id="memoryAvatarInput" type="file" accept="image/*" style="display:none" onchange="changeMemoryAvatar(event)">
+</div>
+<input class="hidden-input" type="file" accept="image/*" id="memoryPhotoInput" onchange="memoryPhotoChosen(this)">
+
+<div class="dots" id="dots"></div>
+</div>
+
+<div class="dock">
+<div class="dock-icon" onclick="handleAppAction(getAppById('settings'))"><span class="dock-symbol"><svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.9 1.9-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.02 1.56V20h-2.68v-.08A1.7 1.7 0 0 0 11.24 18.36a1.7 1.7 0 0 0-1.88.34l-.06.06-1.9-1.9.06-.06A1.7 1.7 0 0 0 7.8 14.92a1.7 1.7 0 0 0-1.56-1.02H6v-2.68h.08A1.7 1.7 0 0 0 7.64 10.2a1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.9-1.9.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 12.1 5.2V5h2.68v.08a1.7 1.7 0 0 0 1.02 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.9 1.9-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.02H21v2.68h-.08A1.7 1.7 0 0 0 19.4 15Z"/></svg></span><small>设置</small></div>
+<div class="dock-icon" onclick="handleAppAction(getAppById('chat'))"><span class="dock-symbol"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-3.6-.8L3 21l1.8-5.2A8.5 8.5 0 1 1 21 11.5Z"/></svg></span><small>Chat</small></div>
+<div class="dock-icon" onclick="handleAppAction(getAppById('persona'))"><span class="dock-symbol"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="m5.5 7.5 6.5 5 6.5-5"/></svg></span><small>短信</small></div>
+<div class="dock-icon" onclick="handleAppAction(getAppById('user'))"><span class="dock-symbol"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg></span><small>User</small></div>
+</div>
+<div class="home"></div>
+</div>
+
+<!-- 美化面板 -->
+<div class="panel ios-settings" id="beautify">
+<span class="ios-back" onclick="closePanel('beautify')">‹</span>
+<h1>美化</h1>
+<div class="card">
+<div class="field-label">头像</div>
+<div class="upload-avatar-preview" id="beautifyAvatarPreview"></div>
+<div style="text-align:center">
+<label class="btn" for="avatarInput">上传头像</label>
+<span class="btn secondary" onclick="resetAvatar()">恢复默认</span>
+</div>
+<input class="hidden-input" type="file" accept="image/*" id="avatarInput" onchange="avatarChosen(this)">
+</div>
+<div class="card">
+<div class="field-label"> 锁屏壁纸</div>
+<div style="text-align:center">
+<label class="btn" for="lockWallpaperInput">上传锁屏壁纸</label>
+<span class="btn secondary" onclick="resetLockWallpaper()">恢复默认</span>
+</div>
+<input class="hidden-input" type="file" accept="image/*" id="lockWallpaperInput" onchange="lockWallpaperChosen(this)">
+</div>
+<div class="card">
+<div class="field-label">壁纸</div>
+<div style="text-align:center">
+<label class="btn" for="wallpaperInput">上传壁纸</label>
+<span class="btn secondary" onclick="resetWallpaper()">恢复默认</span>
+</div>
+<input class="hidden-input" type="file" accept="image/*" id="wallpaperInput" onchange="wallpaperChosen(this)">
+</div>
+
+<div class="card">
+<div class="field-label">字体设置</div>
+<div style="font-size:13px;color:#777;margin-bottom:10px">
+支持导入字体文件或填写字体 URL
+</div>
+
+<div class="btn" onclick="openFontPicker()"> 导入字体文件</div>
+<input class="hidden-input" type="file" id="fontFileInput" accept=".ttf,.otf,.ttc"
+onchange="fontFileChosen(this)">
+
+<input type="text" id="fontUrlInput" placeholder="输入字体 URL，例如 https://xxx/font.ttf">
+
+<div class="option" onclick="applyFontSetting()">应用字体</div>
+<div class="option secondary-option" onclick="resetFontSetting()">恢复默认字体</div>
+</div>
+
+
+<div class="card">
+<div class="field-label">系统显示</div>
+
+<div class="ios-row ios-row-toggle">
+<div class="ios-row-label">灵动岛<div class="ios-row-desc">显示顶部灵动岛效果</div></div>
+<label class="ios-switch">
+<input type="checkbox" id="dynamicIslandToggle" onchange="toggleDynamicIsland(this)">
+<span class="ios-switch-track"></span>
+</label>
+</div>
+
+<div class="ios-row ios-row-toggle">
+<div class="ios-row-label">状态栏<div class="ios-row-desc">显示豹豹机内部时间、5G 与电池</div></div>
+<label class="ios-switch">
+<input type="checkbox" id="miniStatusbarToggle" onchange="toggleMiniStatusbar(this)">
+<span class="ios-switch-track"></span>
+</label>
+</div>
+
+
+</div>
+
+<div class="card"><div class="field-label">保存设置</div><div class="option" onclick="saveBeautify()"> 保存当前美化</div><div style="font-size:12px;color:#777;margin-top:8px">下次重新打开仍保留壁纸、头像和桌面状态</div></div>
+<div class="card">
+<div class="field-label">App 图标</div>
+<div style="font-size:13px;color:#777">长按桌面上的任意图标即可修改名称或更换图片</div>
+</div>
+<div class="card">
+<div class="field-label">屏幕模式</div>
+<div class="option" onclick="phoneMode()"> 小手机屏幕</div>
+<div class="option" onclick="fullMode()"> 整个屏幕</div>
+</div>
+</div>
+
+<!-- 聊天背景设置：真正生效的实现，替代原来的"开发中"占位 -->
+<div class="panel ios-settings" id="chatBgSettings">
+<span class="ios-back" onclick="backToChatSettingsFromBg()">‹</span>
+<h1>聊天背景</h1>
+
+<div class="card">
+<div class="field-label">预览</div>
+<div class="chatbg-preview" id="chatBgPreview"></div>
+</div>
+
+<div class="card">
+<div class="field-label">预设颜色</div>
+<div class="chatbg-swatch-row" id="chatBgSwatchRow"></div>
+</div>
+
+<div class="card">
+<div class="field-label">自定义颜色</div>
+<div class="chatbg-custom-color-row">
+<input type="color" id="chatBgColorInput" value="#fafafa" oninput="chatBgColorPicked(this.value)">
+<span style="font-size:13px;color:#777">拖动色块，选一个纯色聊天背景</span>
+</div>
+</div>
+
+<div class="card">
+<div class="field-label">背景图片</div>
+<div style="font-size:13px;color:#777;margin-bottom:10px">图片会自动裁剪压缩，避免占用太多空间</div>
+<div style="text-align:center">
+<label class="btn" for="chatBgImageInput">上传背景图</label>
+<span class="btn secondary" onclick="resetChatBackground()">恢复默认</span>
+</div>
+<input class="hidden-input" type="file" accept="image/*" id="chatBgImageInput" onchange="chatBgImageChosen(this)">
+</div>
+
+<div class="card"><div class="option" onclick="backToChatSettingsFromBg()">完成</div></div>
+</div>
+
+<!-- 设置面板：iOS 风格 -->
+<div class="panel ios-settings" id="settings">
+<span class="ios-back" onclick="closePanel('settings')">‹</span>
+<h1>设置</h1>
+
+<div class="ios-search">
+<span></span>
+<input type="text" id="settingsSearchInput" placeholder="搜索" oninput="filterSettingsRows(this.value)">
+</div>
+
+<div class="ios-profile-card" onclick="editDesktopProfile()">
+<div class="ios-profile-avatar" id="settingsAvatarPreview"></div>
+<div>
+<div class="ios-profile-name" id="settingsProfileName">未设置昵称</div>
+<div class="ios-profile-sub">桌面昵称与状态文案</div>
+</div>
+<div class="ios-row-chevron">›</div>
+</div>
+
+<div class="ios-group">
+<div class="ios-row" data-label="API设置" onclick="openPanel('apiSettings')">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">API 设置</div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" data-label="查看最近一次人设Prompt" onclick="openPersonaDebugPanel()">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">查看最近一次人设 Prompt<div class="ios-row-desc">诊断：确认人设内容有没有真的发给模型</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" data-label="Minimax语音合成" onclick="openPanel('minimaxAPI')">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">Minimax语音合成</div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row ios-row-toggle" data-label="后台消息通知">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">
+后台消息通知
+<div class="ios-row-desc">全局开启后，手动点私聊回复按钮才会生成；退出豹豹机后完成时发送 iPhone 通知</div>
+<span class="bb-bg245-status" id="bbBg245Status"></span>
+</div>
+<label class="ios-switch">
+<input type="checkbox" id="bbBg245Toggle" onchange="this.checked ? enableBaobaoBackgroundPush245() : disableBaobaoBackgroundPush245()">
+<span class="ios-switch-track"></span>
+</label>
+</div>
+<div class="ios-row" data-label="测试系统通知" id="bbBg245TestRow" onclick="testBaobaoBackgroundPush245()">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">
+测试系统通知
+<div class="ios-row-desc">向当前这台 iPhone 发送一条豹豹机测试通知</div>
+</div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row ios-row-toggle" data-label="时间感知">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">时间感知<div class="ios-row-desc">让AI知道现实时间与消息间隔</div></div>
+<label class="ios-switch">
+<input type="checkbox" id="timeAwareToggle" onchange="onTimeAwareToggle(this)">
+<span class="ios-switch-track"></span>
+</label>
+</div>
+<div class="ios-row" data-label="锁屏密码" onclick="openLockPasswordEdit()">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">锁屏密码</div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row ios-row-toggle" data-label="整屏显示">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">整屏显示<div class="ios-row-desc">隐藏手机边框，撑满屏幕</div></div>
+<label class="ios-switch">
+<input type="checkbox" id="fullScreenToggle" onchange="onFullScreenToggle(this)">
+<span class="ios-switch-track"></span>
+</label>
+</div>
+</div>
+
+<div class="ios-group">
+
+<div class="ios-row" data-label="关于">
+<div class="ios-row-icon">ℹ</div>
+<div class="ios-row-label">关于<div class="ios-row-desc">斑斑豹 · 自定义手机主题 demo</div></div>
+</div>
+</div>
+
+</div>
+
+
+<div class="panel ios-settings" id="apiSettings">
+<span class="ios-back" onclick="closePanel('apiSettings')">‹</span>
+<h1>API 设置</h1>
+<div class="ios-group">
+<div class="ios-row" onclick="openPanel('chatAPI')">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">对话 API<div class="ios-row-desc">微信、短信、朋友圈与线下文字生成</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" onclick="openPanel('visionAPI')">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">视觉识别 API<div class="ios-row-desc">照片、截图与表情包理解</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" onclick="openPanel('imageAPI')">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">生图 API<div class="ios-row-desc">只负责生成图片，不参与识图</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+</div>
+</div>
+
+
+<div class="panel ios-settings" id="chatAPI">
+<span class="ios-back" onclick="closePanel('chatAPI')">‹</span>
+<h1>对话 API</h1>
+<div style="font-size:14px;color:#888;margin:10px 0">支持 OpenAI 兼容接口，官方站点或第三方中转站都可以填</div>
+
+<div class="card">
+服务商备注<br>
+<input type="text" id="chatProvider" placeholder="OpenAI / 中转站A / 自定义">
+</div>
+
+<div class="card">
+API Key<br>
+<input type="text" id="chatApiKey" placeholder="sk-xxxx">
+</div>
+
+<div class="card">
+接口地址<br>
+<input type="text" id="chatEndpoint" placeholder="https://api.example.com/v1">
+</div>
+
+<div class="card">
+默认模型<br>
+<input type="text" id="chatModel" placeholder="gpt-4.1-mini">
+<div class="option secondary-option" onclick="fetchModelList('chatAPI')"> 拉取模型列表</div>
+<div class="preset-chip-wrap" id="chatAPIModelPicker"></div>
+</div>
+
+<div class="card">
+<div class="field-label">Temperature 温度参数</div>
+<input type="range" id="chatTemperature" min="0" max="2" step="0.1" value="0.7" oninput="updateTemperatureLabel(this.value)" style="width:100%">
+<div style="text-align:center;font-weight:700" id="chatTemperatureValue">0.7</div>
+<div style="font-size:12px;color:#777;line-height:1.6;margin-top:8px">
+温度越低：回答越保守稳定，更容易保持一致人设<br>
+温度越高：回答越有创意多样，但可能偏离人设或出现不稳定表达
+</div>
+</div>
+
+<div class="option" onclick="saveChatAPI()"> 保存对话 API</div>
+<div class="option" onclick="testChatAPI()"> 测试连接</div>
+
+<div class="card">
+<div class="field-label">已保存的预设（比如"官方"和"中转站"可以分别保存，随时切换）</div>
+<div class="preset-chip-wrap" id="chatAPIPresetList"></div>
+<div class="option secondary-option" onclick="openSavePresetEdit('chatAPI')">＋ 保存当前为预设</div>
+</div>
+</div>
+
+<div class="panel ios-settings" id="visionAPI">
+<span class="ios-back" onclick="closePanel('visionAPI')">‹</span>
+<h1>视觉识别 API</h1>
+<div style="font-size:14px;color:#888;margin:10px 0;line-height:1.6">单独填写支持图片输入的 OpenAI 兼容站点。这里只负责看图、读图中文字和理解表情包，不用于生图。</div>
+<div class="card">服务商备注<br><input type="text" id="visionProvider" placeholder="视觉中转站 / Gemini / Qwen-VL / 自定义"></div>
+<div class="card">视觉 API Key<br><input type="text" id="visionApiKey" placeholder="sk-xxxx"></div>
+<div class="card">视觉接口地址<br><input type="text" id="visionEndpoint" placeholder="https://vision.example.com/v1"></div>
+<div class="card">
+视觉模型<br><input type="text" id="visionModel" placeholder="Gemini / GPT-4o / Qwen-VL 等支持识图的模型">
+<div class="option secondary-option" onclick="fetchModelList('visionAPI')">拉取视觉模型列表</div>
+<div class="preset-chip-wrap" id="visionAPIModelPicker"></div>
+<div style="font-size:12px;color:#888;line-height:1.6;margin-top:8px">会把名称中含 vision、VL、MM、Gemini、GPT-4o 等模型优先排列，但最终是否支持图片输入以站点实际能力为准。</div>
+</div>
+<div class="card">
+<div class="field-label">识别范围</div>
+<div class="ios-row ios-row-toggle">
+<div class="ios-row-label">表情包识别<div class="ios-row-desc">分析画面、文字、情绪和聊天意图</div></div>
+<label class="ios-switch"><input type="checkbox" id="emojiRecognitionToggle" checked><span class="ios-switch-track"></span></label>
+</div>
+<div class="ios-row ios-row-toggle">
+<div class="ios-row-label">照片识别<div class="ios-row-desc">理解照片、截图与图片中的文字</div></div>
+<label class="ios-switch"><input type="checkbox" id="imageRecognitionToggle" checked><span class="ios-switch-track"></span></label>
+</div>
+</div>
+<div class="option" onclick="saveVisionAPI()">保存视觉识别 API</div>
+<div class="option" onclick="startVisionTest('image')">测试照片识别</div>
+<div class="option" onclick="startVisionTest('sticker')">测试表情包识别</div>
+<input class="hidden-input" type="file" accept="image/*" id="visionTestFileInput" onchange="visionTestFileChosen(this)">
+<div class="card">
+<div class="field-label">已保存的视觉预设</div>
+<div class="preset-chip-wrap" id="visionAPIPresetList"></div>
+<div class="option secondary-option" onclick="openSavePresetEdit('visionAPI')">＋ 保存当前为预设</div>
+</div>
+</div>
+
+<div class="panel ios-settings" id="imageAPI">
+<span class="ios-back" onclick="closePanel('imageAPI')">‹</span>
+<h1>生图中转站</h1>
+<div style="font-size:14px;color:#888;margin:10px 0;line-height:1.6">填写支持 OpenAI /images/generations 的中转站；网页直接请求填写的地址，不经过 localhost；与视觉识别完全分开。</div>
+<div class="card">中转站备注<br><input type="text" id="imageProvider" placeholder="例如 Heliar / 自定义中转站"></div>
+<div class="card">生图 API Key<br><input type="text" id="imageApiKey" placeholder="sk-xxxx"></div>
+<div class="card">中转站地址<br><input type="text" id="imageEndpoint" placeholder="https://你的中转站.com/v1"></div>
+<div class="card">
+生图模型<br><input type="text" id="imageModel" placeholder="dall-e-3 / imagen / wanx">
+<div class="option secondary-option" onclick="fetchModelList('imageAPI')">拉取生图模型列表</div>
+<div class="preset-chip-wrap" id="imageAPIModelPicker"></div>
+</div>
+<div class="option" onclick="saveImageAPI()">保存生图 API</div>
+<div class="option" onclick="testImageAPI()">测试生图</div>
+<div class="card">
+<div class="field-label">已保存的生图预设</div>
+<div class="preset-chip-wrap" id="imageAPIPresetList"></div>
+<div class="option secondary-option" onclick="openSavePresetEdit('imageAPI')">＋ 保存当前为预设</div>
+</div>
+</div>
+
+<div class="panel ios-settings" id="minimaxAPI">
+<span class="ios-back" onclick="closePanel('minimaxAPI')">‹</span>
+<h1>Minimax语音合成</h1>
+<div style="font-size:14px;color:#888;margin:10px 0">用于把AI的回复朗读出来（T2A v2 接口）</div>
+<div class="card">API Key<br><input type="text" id="minimaxApiKey" placeholder="你的 Minimax API Key"></div>
+<div class="card">Group ID<br><input type="text" id="minimaxGroupId" placeholder="你的 Group ID"></div>
+<div class="card">
+模型<br><input type="text" id="minimaxModel" placeholder="speech-02-turbo">
+<div class="option secondary-option" onclick="showMinimaxModelPicker()"> 常用模型</div>
+<div class="preset-chip-wrap" id="minimaxModelPicker"></div>
+</div>
+<div class="card">
+音色 voice_id<br><input type="text" id="minimaxVoiceId" placeholder="female-shaonv">
+<div class="option secondary-option" onclick="showMinimaxVoicePicker()"> 常用音色</div>
+<div class="preset-chip-wrap" id="minimaxVoicePicker"></div>
+</div>
+<div class="option" onclick="saveMinimaxAPI()"> 保存</div>
+<div class="option" onclick="testMinimaxAPI()"> 测试朗读</div>
+
+<div class="card">
+<div class="field-label">已保存的预设</div>
+<div class="preset-chip-wrap" id="minimaxAPIPresetList"></div>
+<div class="option secondary-option" onclick="openSavePresetEdit('minimaxAPI')">＋ 保存当前为预设</div>
+</div>
+</div>
+<!-- App 占位弹窗 -->
+<div class="panel" id="modal">
+<div class="close-btn" onclick="closePanel('modal')"></div>
+<h2 id="modalTitle">App</h2>
+<div class="card" id="modalBody"></div>
+</div>
+
+<!-- 查手机：subjects 数据体档案（暗色卡片墙） -->
+<div class="subjects-panel" id="subjectsPanel">
+  <div class="subjects-back-btn" onclick="closeSubjectsPanel()">‹ back</div>
+  <div class="subjects-hero">
+    <span class="spark">✦⁺˖</span>
+    <h1>subjects</h1>
+    <div class="sub">DATA EXTRACTED · ARCHIVE</div>
+  </div>
+  <div class="subjects-grid" id="subjectsGrid"></div>
+</div>
+
+<!-- 查手机：点开某张卡片后，进入这个角色自己的手机主页 -->
+<div class="subject-phone-panel" id="subjectPhonePanel">
+  <div class="subject-phone-top">
+    <span class="sp-back" onclick="closeSubjectPhone()">‹</span>
+    <div class="sp-icons">
+      <span onclick="bbPhoneGenerateData()" title="重新生成手机内容">⬇</span>
+      <span onclick="bbPhoneShowSettings()" title="查手机设置">⚙</span>
+    </div>
+  </div>
+  <div class="subject-phone-hero">
+    <div class="subject-phone-avatar" id="subjectPhoneAvatar"></div>
+    <div class="subject-phone-name" id="subjectPhoneName">未命名</div>
+    <div class="subject-phone-loc"> <span id="subjectPhoneLocation">未知定位</span></div>
+    <div class="subject-phone-widget">Typography Widget</div>
+  </div>
+  <div class="subject-phone-apps">
+    <div class="sp-app"><div class="sp-app-icon dark" onclick="openSubjectPhoneApp('shopping')">BUY</div><div class="sp-app-label">购物中心</div></div>
+    <div class="sp-app"><div class="sp-app-icon" onclick="openSubjectPhoneApp('assets')">¥</div><div class="sp-app-label">资产中心</div></div>
+    <div class="sp-app"><div class="sp-app-icon outline" onclick="openSubjectPhoneApp('album')">IMG</div><div class="sp-app-label">相册</div></div>
+    <div class="sp-app"><div class="sp-app-icon italic" onclick="openSubjectPhoneApp('music')">Music</div><div class="sp-app-label">网易云</div></div>
+    <div class="sp-app"><div class="sp-app-icon" onclick="openSubjectPhoneApp('videos')">VID</div><div class="sp-app-label">短视频</div></div>
+    <div class="sp-app"><div class="sp-app-icon italic" onclick="openSubjectPhoneApp('reading')">Read</div><div class="sp-app-label">阅读/小说</div></div>
+    <div class="sp-app"><div class="sp-app-icon dark" onclick="openSubjectPhoneApp('x')">X</div><div class="sp-app-label">论坛/X</div></div>
+    <div class="sp-app"><div class="sp-app-icon italic" onclick="openSubjectPhoneApp('notes')">Note</div><div class="sp-app-label">备忘录</div></div>
+  </div>
+  <div class="subject-phone-search" onclick="openSubjectPhoneApp('browser')">搜索记录</div>
+  <div class="subject-phone-dock">
+    <div class="sp-dock-icon" onclick="openSubjectPhoneApp('calls')">📞</div>
+    <div class="sp-dock-icon" onclick="openSubjectPhoneApp('sms')">✉</div>
+    <div class="sp-dock-icon" onclick="openSubjectPhoneApp('wechat')">💬</div>
+    <div class="sp-dock-icon" onclick="openSubjectPhoneApp('browser')">🌐</div>
+  </div>
+</div>
+
+<!-- 图标编辑面板 -->
+<div class="panel" id="iconEdit">
+<div class="close-btn" onclick="closePanel('iconEdit')"></div>
+<h2>编辑图标</h2>
+<div class="card">
+<div class="field-label">名称</div>
+<input type="text" id="iconEditLabel" placeholder="App 名称">
+<div class="field-label">图片</div>
+<label class="btn" for="iconEditImageInput">上传图标图片</label>
+<input class="hidden-input" type="file" accept="image/*" id="iconEditImageInput" onchange="iconEditImageChosen(this)">
+<div style="margin-top:14px"><span class="btn" onclick="saveIconEdit()">保存</span></div>
+</div>
+</div>
+
+<!-- 文案编辑面板：用真正的输入框，代替 window.prompt（很多手机内置浏览器/WebView 会屏蔽或忽略 prompt 弹窗） -->
+<div class="panel" id="textEdit">
+<div class="close-btn" onclick="closePanel('textEdit')"></div>
+<h2 id="textEditTitle">编辑文案</h2>
+<div class="card">
+<div id="textEditAvatarSection" style="display:none;text-align:center;margin-bottom:10px">
+<div class="upload-avatar-preview" id="textEditAvatarPreview" onclick="triggerWechatAvatarUpload(event)" style="cursor:pointer"></div>
+<div style="font-size:12px;color:#999">点击更换头像</div>
+</div>
+<div class="field-label" id="textEditLabel1">内容 1</div>
+<input type="text" id="textEditInput1" placeholder="">
+<div class="field-label" id="textEditLabel2">内容 2</div>
+<input type="text" id="textEditInput2" placeholder="">
+<div style="margin-top:14px"><span class="btn" onclick="confirmTextEdit()">保存</span></div>
+</div>
+</div>
+
+<!-- 人设创建/编辑面板：EDITING ARCHIVE 情报档案风格 -->
+<div class="panel archive-panel" id="personaArchive">
+<div class="archive-back" onclick="closeArchivePanel()">‹</div>
+<div class="archive-card">
+
+  <div class="archive-card-head">
+    <div>
+      <div class="archive-title">EDITING ARCHIVE</div>
+      <div class="archive-subtitle">THE INTELLIGENCE DATABASE</div>
+    </div>
+    <div class="archive-id-wrap">
+      <div class="archive-id-badge" id="archiveIdBadge">ID: CHAR_178</div>
+      <div class="archive-stamp">CLASSIFIED</div>
+    </div>
+  </div>
+
+  <div class="archive-photo-row">
+    <div class="archive-photo-box" id="archivePhotoBox" onclick="triggerArchivePhotoUpload()">
+      <div class="archive-photo-icon"></div>
+      <div class="archive-photo-text">Change Photo</div>
+    </div>
+    <div class="archive-name-wrap">
+      <div class="archive-field-caption">TARGET NAME / CODENAME</div>
+      <input type="text" id="archiveNameInput" class="archive-name-input" placeholder="Name or Codename">
+    </div>
+  </div>
+  <div class="archive-imgurl-btn" onclick="useImgUrlForArchivePhoto()">Use IMG URL</div>
+  <label class="archive-import-btn archive-import-file-btn">
+    导入人设文件
+    <input type="file" accept="application/json,.json" id="personaImportInput" onchange="personaImportChosen(this)">
+  </label>
+  <input class="hidden-input" type="file" accept="image/*" id="archivePhotoInput" onchange="archivePhotoChosen(this)">
+
+  <div class="archive-meta-row">
+    <div class="archive-meta-col">
+      <div class="archive-meta-label">STATUS</div>
+      <div class="archive-meta-value" id="archiveStatusValue">EDITING</div>
+    </div>
+    <div class="archive-meta-col">
+      <div class="archive-meta-label">WECHAT</div>
+      <div class="archive-meta-value" id="archiveWechatValue">--</div>
+    </div>
+    <div class="archive-meta-col">
+      <div class="archive-meta-label">UPDATE</div>
+      <div class="archive-meta-value" id="archiveUpdateValue">--</div>
+    </div>
+  </div>
+
+  <div class="archive-tags-row">
+    <div class="archive-tags-col">
+      <div class="archive-field-caption">TAGS</div>
+      <div class="archive-tag-input-row">
+        <input type="text" id="archiveTagInput" class="archive-dashed-input" placeholder="Add tag...">
+        <div class="archive-add-btn" onclick="addArchiveTag()">ADD</div>
+      </div>
+      <div class="archive-tag-list" id="archiveTagList"></div>
+    </div>
+    <div class="archive-timezone-col">
+      <div class="archive-field-caption">TIMEZONE</div>
+      <input type="text" id="archiveTimezoneInput" class="archive-dashed-input" value="SYSTEM">
+    </div>
+  </div>
+
+  <div class="archive-section-label">PERSONA / TRAITS</div>
+  <textarea id="archivePersonaTextarea" class="archive-textarea" placeholder="Describe background, personality..."></textarea>
+
+
+  <div class="archive-divider"></div>
+
+  <div class="archive-section-label">CHAT STYLE / 关系语气模式</div>
+  <select id="archiveChatStyleMode" class="archive-dashed-input" onchange="updateArchiveChatStyleHintV324()" style="width:100%;height:44px;margin-top:8px;background:#fff;color:#222">
+    <option value="auto">自动判断（优先按完整人设）</option>
+    <option value="younger">年下黏糊：爱撒娇、黏人、死皮赖脸</option>
+    <option value="older">年上简洁：成熟、话少、有年上感</option>
+    <option value="neutral">自然人设：不套两种极端</option>
+  </select>
+  <div id="archiveChatStyleHintV324" style="font-size:12px;line-height:1.55;color:#8a8a8f;margin:8px 2px 2px">自动判断会读取年下、撒娇、黏人、年上、成熟、寡言等人设词；不稳定时可手动锁定。</div>
+
+  <div class="archive-divider"></div>
+
+  <div class="archive-section-label">PERSONALITY</div>
+  <textarea id="archivePersonalityTextarea" class="archive-textarea" placeholder="Character personality traits..."></textarea>
+
+  <div class="archive-brief-head">
+    <div class="archive-section-label">BRIEF PERSONA / 简量人设</div>
+    <div class="archive-ai-btn" onclick="aiGenerateBriefPersona()">AI 生成</div>
+  </div>
+  <div class="archive-brief-desc">会注入给同世界与 TA 有关系的角色，帮助对方提到 TA 时不 OOC。</div>
+  <textarea id="archiveBriefTextarea" class="archive-textarea" placeholder="点「AI 生成」自动压缩人设，或手写 100~200 字简介..."></textarea>
+
+  <div class="archive-save-row"><span class="btn" onclick="savePersonaArchive()">保存人设</span></div>
+  <div class="archive-delete-row" id="archiveDeleteRow" style="display:none">
+    <span class="archive-delete-btn" onclick="deletePersonaArchive()">删除此人设</span>
+  </div>
+
+</div>
+</div>
+
+<div class="chat-demo" id="chatDemo">
+<div class="chat-plus-menu" id="chatPlusMenu">
+<div onclick="openPersonaSelect()">发起聊天</div>
+<div onclick="openGroupChat()">发起群聊</div>
+<div onclick="openFriendSearch()">添加好友</div>
+<div data-bb-social-story onclick="openSocialStoryPanel()">社交剧情</div>
+</div>
+
+<!-- Tab: 聊天 -->
+<div class="app-tab-content bb-message-layout" id="tabChat">
+<div class="bb-message-header">
+  <button class="bb-message-title bb-message-back" type="button" onclick="closeWeChatApp()" aria-label="返回桌面">‹ Message</button>
+  <button class="bb-message-icon-btn" type="button" onclick="openChatPlusMenu()" aria-label="聊天菜单">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 6.75A2.25 2.25 0 0 1 6.75 4.5h10.5a2.25 2.25 0 0 1 2.25 2.25v7.5a2.25 2.25 0 0 1-2.25 2.25H10.2l-4.62 3.33a.75.75 0 0 1-1.18-.61v-2.72A2.24 2.24 0 0 1 2.5 14.25v-7.5A2.25 2.25 0 0 1 4.5 6.75Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 9.25h8M8 12.25h5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </button>
+</div>
+
+<div class="bb-message-tabs">
+  <span class="active">Works ▾</span>
+  <span>Daily</span>
+  <span>Collections</span>
+  <span>Likes</span>
+</div>
+
+<div class="bb-private-works-bar">
+  <div class="bb-private-works-left"><span class="bb-private-lock">🔒</span><span>Private works</span></div>
+  <div class="bb-private-works-right">22 ›</div>
+</div>
+
+<div class="bb-message-gallery">
+  <div class="bb-message-gallery-left">
+    <div class="bb-msg-photo" id="chatLandingPhoto0" onclick="bbOpenChatLandingPhoto(0)">
+      <div class="bb-msg-photo-meta">
+        <div class="bb-msg-photo-title">#inmyfeeling</div>
+        <div class="bb-msg-photo-sub">04-20</div>
+      </div>
+    </div>
+    <div class="bb-msg-photo" id="chatLandingPhoto1" onclick="bbOpenChatLandingPhoto(1)">
+      <div class="bb-msg-photo-meta">
+        <div class="bb-msg-photo-title">soft memory</div>
+        <div class="bb-msg-photo-sub">04-19</div>
+      </div>
+    </div>
+  </div>
+  <div class="bb-msg-photo bb-msg-photo-large" id="chatLandingPhoto2" onclick="bbOpenChatLandingPhoto(2)">
+    <div class="bb-msg-photo-meta">
+      <div class="bb-msg-photo-title">Dont_leave_me_alone</div>
+      <div class="bb-msg-photo-sub">33w</div>
+    </div>
+  </div>
+</div>
+<input class="hidden-input" type="file" accept="image/*" id="chatLandingPhotoInput" onchange="bbHandleChatLandingPhoto(this)">
+
+<div class="bb-open-question">
+  <span>“新对话 · 是否展开”</span>
+  <strong>YES/NO</strong>
+</div>
+
+<div class="bb-chat-self-row" role="presentation" aria-hidden="true">
+  <div class="bb-chat-self-avatar" id="wechatAvatar"></div>
+  <div class="bb-chat-self-info">
+    <div class="bb-chat-self-top">新建聊天室 <span class="bb-chat-self-count">👥2</span></div>
+    <div class="bb-chat-self-handle" id="wechatHandle">@cline_123</div>
+    <div class="bb-chat-self-bio" id="friendBio">それは私の夢の住所への道だから</div>
+  </div>
+  <div class="bb-chat-self-time">夜8:04</div>
+</div>
+
+<div class="bb-message-section-title">Mates<span>⌄</span></div>
+<div class="chat-recent-list bb-chat-home-list" id="chatRecentList"></div>
+</div>
+
+<!-- Tab: 创建人设 / Contacts -->
+<div class="app-tab-content" id="tabContacts" style="display:none">
+<div class="tab-head-row"><span class="tab-back-btn" onclick="closeWeChatApp()">‹</span><div class="contacts-head">Contacts</div></div>
+<div class="contacts-quickrow" id="contactsQuickRow"></div>
+<div class="archive-contact-list" id="archiveContactList"></div>
+</div>
+
+<!-- Tab: 朋友圈 / Discover -->
+<div class="app-tab-content" id="tabDiscover" style="display:none">
+<div class="discover-head"><span style="display:flex;align-items:center;gap:8px"><span class="tab-back-btn" onclick="closeWeChatApp()">‹</span>Discover</span><button class="moments-plus-btn" type="button" onclick="openMomentsPublisher()" aria-label="发布朋友圈">＋</button></div>
+<div class="discover-post">
+<div class="discover-post-img" id="discoverCover" onclick="triggerCoverUpload(event)" style="background:linear-gradient(160deg,#2b2b2b,#555);aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:14px">
+
+<div class="discover-name" id="discoverName" onclick="openWechatProfileEditor(event)" style="cursor:pointer">Cline</div>
+<div class="discover-badge" id="discoverBadge" onclick="openWechatProfileEditor(event)" style="cursor:pointer"></div>
+</div>
+<div class="discover-caption" id="discoverCaption">你淡漠的瞳孔裡藏着一场有時差的雨</div>
+</div>
+<div id="momentsFeed" class="moments-feed"></div>
+</div>
+
+<!-- Tab: 我的 / Me -->
+<div class="app-tab-content" id="tabMe" style="display:none">
+<div class="tab-head-row"><span class="tab-back-btn" onclick="closeWeChatApp()">‹</span><div class="contacts-head">Profile</div></div>
+<div class="me-card" onclick="openWechatProfileEditor()">
+<div class="me-avatar" id="meAvatar"></div>
+<div>
+<div class="me-name" id="meName">Cline</div>
+<div class="me-id" id="wechatMeId">微信号: cline_123</div>
+</div>
+</div>
+<div class="ios-group" style="margin-top:18px">
+<div class="ios-row" onclick="openStickerManager()">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">表情包管理</div>
+<div class="ios-row-chevron">›</div>
+</div>
+</div>
+<div class="ios-group" style="margin-top:18px">
+<div class="ios-row" onclick="openWalletManager()">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">我的钱包</div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" onclick="openFavoriteMessages()">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">我的收藏</div>
+<div class="ios-row-chevron">›</div>
+</div>
+</div>
+</div>
+
+<input class="hidden-input" type="file" accept="image/*" id="coverInput" onchange="coverChosen(this)">
+<input class="hidden-input" type="file" accept="image/*" multiple id="stickerFileInput" onchange="stickerFilesChosen(this)">
+<div class="app-tabbar" id="appTabbar">
+<div class="app-tabbar-item active" data-tab="tabChat" onclick="switchAppTab('tabChat')">Chat</div>
+<div class="app-tabbar-item" data-tab="tabContacts" onclick="switchAppTab('tabContacts')">Contacts</div>
+<div class="app-tabbar-item" data-tab="tabDiscover" onclick="switchAppTab('tabDiscover')">Discover</div>
+<div class="app-tabbar-item" data-tab="tabMe" onclick="switchAppTab('tabMe')">Me</div>
+</div>
+
+</div>
+
+
+<div class="persona-select-panel" id="personaSelectPanel">
+<div class="chat-top"><span onclick="closePersonaSelect()">‹</span><span>选择人设</span><span></span></div>
+<div id="personaSelectList"></div>
+</div>
+
+<div class="persona-select-panel" id="friendSearchPanel">
+<div class="chat-top"><span onclick="closeFriendSearch()">‹</span><span>添加好友</span><span></span></div>
+<input type="text" id="friendSearchInput" placeholder="搜索11位微信号" oninput="searchFriendByWechat(this.value)" style="width:100%;padding:14px;border-radius:14px;border:1px solid #ddd">
+<div id="friendSearchResult" style="margin-top:20px"></div>
+</div>
+<div class="chat-room" id="chatRoom">
+<div class="chat-head">
+<span onclick="closeChatRoom()" style="cursor:pointer" class="chat-head-back">‹</span>
+<div class="chat-head-info">
+<div class="chat-head-avatar" id="chatHeadAvatar"></div>
+<span class="chat-head-name" id="chatHeadName">谢云初</span>
+</div>
+<div class="chat-head-actions">
+<span class="chat-head-icon-btn inner-voice-heart-btn" id="innerVoiceBtn" onclick="openInnerVoicePanel()" title="心声" aria-label="查看心声">
+  <svg class="inner-voice-heart-svg" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"/>
+  </svg>
+  <span class="inner-voice-new-dot" id="innerVoiceNewDot"></span>
+</span>
+<span class="chat-head-icon-btn" onclick="openChatSettings()" title="聊天设置">⋮</span>
+</div>
+</div>
+<div class="chat-msgs" id="chatMsgs"></div>
+<div class="chat-input-bar">
+<span class="chat-tool-btn" onclick="openTools()" title="信息">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 10v6"/><circle cx="12" cy="7" r="1" fill="currentColor" stroke="none"/></svg>
+</span>
+<input type="text" id="chatInputBox" placeholder="发消息…" onkeydown="if(event.key==='Enter'){sendUserMessage()}">
+<span class="chat-reply-btn" id="chatReplyBtn" onclick="event.stopPropagation(); if(window.triggerAIReply){ window.triggerAIReply(); }">💬</span>
+<button class="chat-send-btn" onclick="sendUserMessage()">发送</button>
+</div>
+<div class="tool-box" id="tools" style="display:none">
+<div class="tool-item"><br>重回</div>
+<div class="tool-item" onclick="speakLastAIMessage()"><br>语音</div>
+<div class="tool-item"><br>表情</div>
+<div class="tool-item"><br>拍照</div>
+<div class="tool-item" onclick="openImagePromptEdit()"><br>图片</div>
+<div class="tool-item"><br>转账</div>
+<div class="tool-item"><br>分享链接</div>
+<div class="tool-item"><br>电话</div>
+<div class="tool-item anti-recon-tool" data-bb-recon-entry="1" onclick="return baobaoOpenAntiReconExplicit(this,event)"><br>反侦察</div>
+</div>
+
+<div class="inner-voice-overlay" id="innerVoiceOverlay" onclick="if(event.target===this)closeInnerVoicePanel()">
+<div class="inner-voice-card">
+<div class="inner-voice-avatar" id="innerVoiceAvatar"></div>
+<div class="inner-voice-follow-btn" id="innerVoiceFollowBtn" onclick="toggleInnerVoiceFollow(this)">关注</div>
+<div class="inner-voice-section-label">〈关于我〉/ 关于我</div>
+<div class="inner-voice-title" id="innerVoiceName"></div>
+<div class="inner-voice-quote" id="innerVoiceQuote"></div>
+<div class="inner-voice-body inner-voice-row" id="innerVoiceBody"></div>
+<div class="inner-voice-sign" id="innerVoiceSign"></div>
+<hr class="inner-voice-divider">
+<div class="inner-voice-final inner-voice-row" id="innerVoiceFinal"></div>
+</div>
+</div>
+
+<div class="msg-context-backdrop" id="msgContextBackdrop" onclick="closeMessageMenu()"></div>
+<div class="msg-context-menu" id="msgContextMenu"></div>
+
+<div class="msg-edit-overlay" id="msgEditOverlay" onclick="if(event.target===this)closeMessageEditor()">
+  <div class="msg-edit-sheet">
+    <div class="msg-edit-head">
+      <div class="msg-edit-title">编辑消息</div>
+      <button class="msg-edit-close" type="button" onclick="closeMessageEditor()">×</button>
+    </div>
+
+    <div class="msg-edit-body">
+      <div class="msg-edit-meta">
+        <div class="msg-edit-author" id="msgEditAuthor">消息</div>
+        <div class="msg-edit-time" id="msgEditTime"></div>
+      </div>
+
+      <div class="msg-edit-divider"></div>
+
+      <div class="msg-edit-label">消息内容：</div>
+      <textarea class="msg-edit-input" id="msgEditInput" maxlength="100000" oninput="updateMessageEditCount()"></textarea>
+      <div class="msg-edit-count" id="msgEditCount">0/100000</div>
+
+      <div class="msg-edit-format-box">
+        <div class="msg-edit-format-title">快速格式修复：</div>
+        <div class="msg-edit-format-grid">
+          <button class="msg-edit-format active" data-type="text" onclick="setMessageEditType('text')">A&nbsp; 文本</button>
+          <button class="msg-edit-format" data-type="image" onclick="setMessageEditType('image')">▣&nbsp; 图片</button>
+          <button class="msg-edit-format" data-type="voice" onclick="setMessageEditType('voice')">🔊&nbsp; 语音</button>
+          <button class="msg-edit-format" data-type="sticker" onclick="setMessageEditType('sticker')">☺&nbsp; 表情包</button>
+          <button class="msg-edit-format" data-type="transfer" onclick="setMessageEditType('transfer')">▣&nbsp; 转账</button>
+          <button class="msg-edit-format" data-type="location" onclick="setMessageEditType('location')">●&nbsp; 定位</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg-edit-actions">
+      <button class="msg-edit-cancel" onclick="closeMessageEditor()">取消</button>
+      <button class="msg-edit-save" onclick="saveEditedMessage()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="msg-quote-bar" id="msgQuoteBar">
+  <div class="msg-quote-bar-main">
+    <div class="msg-quote-bar-label">引用消息</div>
+    <div class="msg-quote-bar-text" id="msgQuoteBarText"></div>
+  </div>
+  <button class="msg-quote-bar-close" onclick="clearQuotedMessage()">×</button>
+</div>
+
+</div>
+
+<div class="favorite-msg-overlay" id="favoriteMsgOverlay" onclick="if(event.target===this)closeFavoriteMessages()">
+  <div class="favorite-msg-sheet">
+    <div class="favorite-msg-top">
+      <span class="favorite-msg-back" onclick="closeFavoriteMessages()">‹</span>
+      <div class="favorite-msg-title">我的收藏</div>
+      <span></span>
+    </div>
+    <div class="favorite-msg-list" id="favoriteMsgList"></div>
+  </div>
+</div>
+
+<div class="panel ios-settings" id="chatSettingsPanel">
+<span class="ios-back" onclick="closeChatSettings()">‹</span>
+<h1>聊天设置</h1>
+
+<div class="ios-group">
+<div class="ios-row" onclick="openChatAvatarSettings()">
+<div class="ios-row-label">双方头像设置<div class="ios-row-desc">设置在此聊天窗口中显示的头像</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row anti-recon-settings-entry" data-bb-recon-entry="1" onclick="return baobaoOpenAntiReconExplicit(this,event)">
+<div class="ios-row-label">反侦察系统<div class="ios-row-desc">角色查看你的豹豹机、倒计时、藏记录和抢回手机</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" onclick="openAppModal('双方备注设置')">
+<div class="ios-row-label">双方备注设置<div class="ios-row-desc">设置在此聊天窗口中显示的昵称</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" onclick="openAppModal('界面字体颜色设置')">
+<div class="ios-row-label">界面字体颜色设置<div class="ios-row-desc">自定义聊天界面文字颜色</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" onclick="openChatBgSettings()">
+<div class="ios-row-label">聊天背景设置<div class="ios-row-desc">自定义聊天界面的背景图片</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" onclick="openAppModal('气泡样式设置')">
+<div class="ios-row-label">气泡样式设置及css代码填入<div class="ios-row-desc">选择气泡外观样式和颜色</div></div>
+<span style="font-size:13px;color:#999;margin-right:6px">默认样式</span>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row ios-row-toggle">
+<div class="ios-row-label">我的状态<div class="ios-row-desc">开启后角色可以感知您的当前状态</div></div>
+<label class="ios-switch"><input type="checkbox" onchange="placeholderToggle(this)"><span class="ios-switch-track"></span></label>
+</div>
+<div class="ios-row ios-row-toggle">
+<div class="ios-row-label">显示角色状态<div class="ios-row-desc">在聊天界面显示角色的在线状态和活动</div></div>
+<label class="ios-switch"><input type="checkbox" onchange="placeholderToggle(this)"><span class="ios-switch-track"></span></label>
+</div>
+<div class="ios-row ios-row-toggle">
+<div class="ios-row-label">线上显示线下剧情<div class="ios-row-desc">在线上聊天中直接显示线下剧情模式的对话记录</div></div>
+<label class="ios-switch"><input type="checkbox" onchange="placeholderToggle(this)"><span class="ios-switch-track"></span></label>
+</div>
+<div class="ios-row ios-row-toggle">
+<div class="ios-row-label">MiniMax 语音<div class="ios-row-desc">启用后，语音条、通话、陪伴模式将播放真实语音</div></div>
+<label class="ios-switch"><input type="checkbox" onchange="placeholderToggle(this)"><span class="ios-switch-track"></span></label>
+</div>
+</div>
+
+<div class="ios-group">
+<div class="ios-row" onclick="openAppModal('戳一戳后缀设置')">
+<div class="ios-row-label">戳一戳后缀设置<div class="ios-row-desc">自定义双方的戳一戳动作后缀</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+</div>
+
+<div class="ios-group">
+<div class="ios-row" onclick="openAppModal('附带历史消息数')">
+<div class="ios-row-label">附带历史消息数<div class="ios-row-desc">自定义角色回复时参考的历史对话数量</div></div>
+<span style="font-size:13px;color:#999;margin-right:6px">30回合</span>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" onclick="openAppModal('全局记忆系统')">
+<div class="ios-row-label">全局记忆系统<div class="ios-row-desc">智能记忆管理，让角色记住重要的聊天内容</div></div>
+<span style="font-size:13px;color:#999;margin-right:6px">永久记忆</span>
+<div class="ios-row-chevron">›</div>
+</div>
+</div>
+
+<div class="ios-group">
+<div class="ios-row ios-row-toggle">
+<div class="ios-row-label">时间感知<div class="ios-row-desc">角色会感知当前时间并调整回复</div></div>
+<label class="ios-switch"><input type="checkbox" id="chatTimeAwareToggle" onchange="onTimeAwareToggle(this)"><span class="ios-switch-track"></span></label>
+</div>
+</div>
+
+<div class="ios-group">
+<div class="ios-row ios-row-toggle">
+<div class="ios-row-label">角色主动拨打电话<div class="ios-row-desc">允许角色主动发起通话</div></div>
+<label class="ios-switch"><input type="checkbox" onchange="placeholderToggle(this)"><span class="ios-switch-track"></span></label>
+</div>
+</div>
+
+<div class="ios-group">
+<div class="ios-row" onclick="openTimestampSettings()">
+<div class="ios-row-label">显示时间戳<div class="ios-row-desc">智能间隔显示，并可设置时间戳位置</div></div>
+<span id="timestampSettingSummary" style="font-size:13px;color:#999;margin-right:6px">智能居中</span>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" onclick="exportCurrentChat()">
+<div class="ios-row-label">导出聊天记录<div class="ios-row-desc">导出当前角色的完整聊天数据</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" onclick="triggerImportChat()">
+<div class="ios-row-label">导入聊天记录<div class="ios-row-desc">导入角色的完整聊天数据</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+<input type="file" accept=".json" class="hidden-input" id="chatImportInput" onchange="importCurrentChat(this)">
+</div>
+
+<div class="ios-group">
+<div class="ios-row" onclick="openBlacklistSettings()">
+<div class="ios-row-label" style="color:#e0463c">拉黑管理<div class="ios-row-desc">拉黑/解除拉黑管理</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+<div class="ios-row" onclick="clearCurrentChatRecords()">
+<div class="ios-row-label" style="color:#e0463c">清空聊天记录<div class="ios-row-desc">删除所有历史消息，不可恢复</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+</div>
+
+</div>
+
+<div class="panel ios-settings" id="dualAvatarPanel">
+<span class="ios-back" onclick="closePanel('dualAvatarPanel')">‹</span>
+<h1>双方头像设置</h1>
+
+<div class="bb-avatar-shape-card-v290">
+  <div class="bb-avatar-shape-head-v290">
+    <div class="bb-avatar-shape-preview-v290" id="bbSelfAvatarPreviewV290"></div>
+    <div class="bb-avatar-shape-copy-v290">
+      <b>我的头像</b>
+      <span>只改变聊天里显示的形状</span>
+    </div>
+    <button type="button" class="bb-avatar-change-v290" onclick="bbTriggerSelfAvatarUploadV290()">更换</button>
+  </div>
+  <div class="bb-avatar-shape-picker-v290" data-side="self">
+    <button type="button" data-shape="circle" onclick="bbSetAvatarShapeV290('self','circle')">圆形</button>
+    <button type="button" data-shape="square" onclick="bbSetAvatarShapeV290('self','square')">方形</button>
+  </div>
+</div>
+
+<div class="bb-avatar-shape-card-v290">
+  <div class="bb-avatar-shape-head-v290">
+    <div class="bb-avatar-shape-preview-v290" id="bbPartnerAvatarPreviewV290"></div>
+    <div class="bb-avatar-shape-copy-v290">
+      <b>对方头像</b>
+      <span>当前角色单独保存</span>
+    </div>
+    <button type="button" class="bb-avatar-change-v290" onclick="bbTriggerPartnerAvatarUploadV290()">更换</button>
+  </div>
+  <div class="bb-avatar-shape-picker-v290" data-side="partner">
+    <button type="button" data-shape="circle" onclick="bbSetAvatarShapeV290('partner','circle')">圆形</button>
+    <button type="button" data-shape="square" onclick="bbSetAvatarShapeV290('partner','square')">方形</button>
+  </div>
+</div>
+
+<input class="hidden-input" type="file" accept="image/*" id="bbPartnerAvatarInputV290" onchange="bbPartnerAvatarChosenV290(this)">
+<div class="bb-avatar-shape-tip-v290">头像图片和形状都保存在当前设备。对方头像形状会按角色分别记住。</div>
+</div>
+
+<div class="state-card-backdrop" id="stateCardBackdrop" onclick="closeState()"></div>
+<div class="state-card" id="stateCard">
+<span class="state-card-close" onclick="closeState()">×</span>
+<h3>今日状态</h3>
+
+<div class="state-line"> 心声 <span onclick="editHeart()"></span></div>
+<div id="heartText">今天想陪你聊天。</div>
+<div class="state-line">心情 <span></span></div>
+<div class="state-line">关系 <span> 恋人</span></div>
+</div>
+
+</div>
+
+
+
+
+
+
+
+<div class="panel ios-settings" id="personaDebugPage">
+<span class="ios-back" onclick="closePanel('personaDebugPage')">‹</span>
+<h1>人设 Prompt 诊断</h1>
+<div class="ios-group" style="padding:14px 16px;">
+<div id="personaDebugMeta" style="font-size:13px;color:#888;margin-bottom:10px;"></div>
+<div style="font-size:13px;font-weight:600;margin-bottom:6px;">实际发给模型的完整系统提示词：</div>
+<pre id="personaDebugPrompt" style="white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.6;background:#f7f7f7;border-radius:10px;padding:12px;max-height:45vh;overflow:auto;"></pre>
+<div style="font-size:13px;font-weight:600;margin:14px 0 6px;">模型原始回复：</div>
+<pre id="personaDebugReply" style="white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.6;background:#f7f7f7;border-radius:10px;padding:12px;max-height:20vh;overflow:auto;"></pre>
+</div>
+</div>
+
+<div class="panel ios-settings" id="dataManagerPage">
+<span class="ios-back" onclick="closePanel('dataManagerPage')">‹</span>
+<h1>数据管理</h1>
+
+<div class="ios-group">
+<div class="ios-row" onclick="exportBaobaoData()">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">导出数据<div class="ios-row-desc">保存聊天、设置、API等本地数据</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+
+<div class="ios-row" onclick="document.getElementById('importBaobaoInput').click()">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">导入数据<div class="ios-row-desc">恢复之前导出的备份</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+
+<div class="ios-row" onclick="clearBaobaoData()" style="color:#ff3b30">
+<div class="ios-row-icon"></div>
+<div class="ios-row-label">清除全部数据<div class="ios-row-desc">删除所有本地保存内容</div></div>
+<div class="ios-row-chevron">›</div>
+</div>
+</div>
+
+<input id="importBaobaoInput" type="file" accept=".json" style="display:none" onchange="importBaobaoData(this)">
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="hdna-overlay" id="humanDNAOverlay">
+  <div class="hdna-noise"></div>
+  <div class="hdna-topbar">
+    <div class="hdna-back" onclick="closeHumanDNA()">‹</div>
+    <div class="hdna-kicker" id="hdnaTitleTap">HUMAN DNA</div>
+    <div class="hdna-edit" id="hdnaEditBtn" onclick="toggleHumanDNAEdit()">EDIT</div>
+  </div>
+  <div class="hdna-scroll">
+    <div class="hdna-head">
+      <div class="hdna-avatar" id="hdnaAvatar"></div>
+      <div class="hdna-name" id="hdnaName">未命名</div>
+      <div class="hdna-id" id="hdnaId">CHARACTER GENOME</div>
+      <div class="hdna-live"><span class="hdna-live-dot"></span><span id="hdnaLiveText">LIVE · CONNECTED</span></div>
+    </div>
+    <section class="hdna-card">
+      <div class="hdna-card-title">LIVE STATUS <b>REAL TIME</b></div>
+      <div class="hdna-status-grid">
+        <div class="hdna-status-cell"><div class="hdna-status-label">MOOD</div><div class="hdna-status-value" id="hdnaMood">平静</div></div>
+        <div class="hdna-status-cell"><div class="hdna-status-label">RELATION</div><div class="hdna-status-value" id="hdnaRelationLabel">正在了解</div></div>
+        <div class="hdna-status-cell"><div class="hdna-status-label">REPLY DESIRE</div><div class="hdna-status-value" id="hdnaReplyDesire">72%</div></div>
+        <div class="hdna-status-cell"><div class="hdna-status-label">CURRENT STATE</div><div class="hdna-status-value" id="hdnaCurrentState">想继续聊</div></div>
+      </div>
+    </section>
+    <section class="hdna-card" id="hdnaTraitsCard"><div class="hdna-card-title">PERSONA MATRIX <b>DYNAMIC</b></div><div id="hdnaTraits"></div><button class="hdna-save" onclick="saveHumanDNA()">保存人格 DNA</button></section>
+    <section class="hdna-card"><div class="hdna-card-title">INNER VOICE <b>PRIVATE</b></div><div class="hdna-voice" id="hdnaVoice">其实挺想继续聊。\n但不想表现得太明显。</div></section>
+    <section class="hdna-card"><div class="hdna-card-title">RELATIONSHIP <b>EVOLVING</b></div><div class="hdna-relation-main"><div class="hdna-relation-percent" id="hdnaRelationPercent">42%</div><div class="hdna-relation-stage" id="hdnaRelationStage">熟悉中</div></div><div class="hdna-relation-track"><div class="hdna-relation-fill" id="hdnaRelationFill"></div></div><div class="hdna-mini-grid"><div class="hdna-mini"><b id="hdnaTrust">48</b><span>TRUST</span></div><div class="hdna-mini"><b id="hdnaAttach">37</b><span>ATTACHMENT</span></div><div class="hdna-mini"><b id="hdnaJealousy">22</b><span>JEALOUSY</span></div></div></section>
+    <section class="hdna-card"><div class="hdna-card-title">MEMORY ARCHIVE <b>EPISODIC</b></div><div class="hdna-memory" id="hdnaMemory"></div></section>
+    <section class="hdna-card hdna-dev" id="hdnaDeveloper"><div class="hdna-card-title">DEVELOPER LAYER <b>UNLOCKED</b></div><div id="hdnaDeveloperRows"></div></section>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 朋友圈完整发布器：仅新增功能，不改原 Discover 大图 UI -->
+<div class="moments-publisher" id="momentsPublisher">
+  <div class="moments-publisher-head">
+    <div class="moments-publisher-back" onclick="closeMomentsPublisher()">‹</div>
+    <div class="moments-publisher-title">发表动态</div>
+    <button class="moments-publisher-send" id="momentsPublishBtn" onclick="publishMoment()" disabled>发表</button>
+  </div>
+  <div class="moments-publisher-scroll">
+    <textarea id="momentsText" class="moments-textarea" maxlength="500" placeholder="此刻想法…" oninput="momentsDraftChanged()"></textarea>
+    <div class="moments-count"><span id="momentsCharCount">0</span>/500</div>
+    <div class="moments-image-grid" id="momentsImageGrid"></div>
+    <input id="momentsImageInput" type="file" accept="image/*" multiple style="display:none" onchange="momentsImagesChosen(this)">
+    <div class="moments-setting-list">
+      <div class="moments-setting-row" onclick="setMomentsLocation()"><div class="moments-setting-icon">⌖</div><div class="moments-setting-label">所在位置</div><div class="moments-setting-value" id="momentsLocationValue">不显示</div><div class="moments-setting-chevron">›</div></div>
+      <div class="moments-setting-row" onclick="openMomentsPeoplePanel('remind')"><div class="moments-setting-icon">＠</div><div class="moments-setting-label">提醒谁看</div><div class="moments-setting-value" id="momentsRemindValue">未选择</div><div class="moments-setting-chevron">›</div></div>
+      <div class="moments-setting-row" onclick="openMomentsVisibilityPanel()"><div class="moments-setting-icon">◉</div><div class="moments-setting-label">谁可以看</div><div class="moments-setting-value" id="momentsVisibilityValue">公开</div><div class="moments-setting-chevron">›</div></div>
+    </div>
+  </div>
+</div>
+<div class="moments-subpanel" id="momentsSubpanel">
+  <div class="moments-sub-head"><div class="moments-sub-back" onclick="closeMomentsSubpanel()">‹</div><div class="moments-sub-title" id="momentsSubTitle">选择</div><div class="moments-sub-done" onclick="finishMomentsSubpanel()">完成</div></div>
+  <div class="moments-sub-body" id="momentsSubBody"></div>
+</div>
+
+
+
+
+
+<div class="wechat-profile-editor" id="wechatProfileEditor">
+  <div class="wechat-profile-back" onclick="closeWechatProfileEditor()">‹</div>
+  <div class="wechat-profile-title">编辑头像与昵称</div>
+  <div class="wechat-profile-edit-card">
+    <div class="wechat-profile-avatar-edit" id="wechatProfileAvatarEdit" onclick="document.getElementById('wechatProfileAvatarFile').click()"></div>
+    <div class="wechat-profile-avatar-tip">点击更换头像</div>
+    <input type="file" accept="image/*" id="wechatProfileAvatarFile" class="hidden-input" onchange="wechatProfileAvatarFileChosen(this)">
+    <div class="wechat-profile-label">昵称</div>
+    <input class="wechat-profile-input" id="wechatProfileNameInput" type="text" maxlength="24" placeholder="请输入微信昵称">
+    <div class="wechat-profile-label">微信号</div>
+    <input class="wechat-profile-input" id="wechatProfileIdInput" type="text" maxlength="30" placeholder="例如 cline_123">
+    <div class="wechat-profile-note">支持字母、数字、下划线和短横线；页面会自动显示为 @微信号。</div>
+    <div class="wechat-profile-label">状态文案</div>
+    <input class="wechat-profile-input" id="wechatProfileBioInput" type="text" maxlength="80" placeholder="请输入状态文案">
+    <button class="wechat-profile-save" type="button" onclick="saveWechatProfileEditor()">保存</button>
+  </div>
+</div>
+
+
+
+<div class="bb-sheet-mask" id="bbTimestampMask" onclick="if(event.target===this)closeTimestampSettings()"><div class="bb-sheet">
+ <div class="bb-sheet-head"><div class="bb-sheet-title">时间戳设置</div><div class="bb-sheet-close" onclick="closeTimestampSettings()">×</div></div>
+ <div class="bb-sheet-body">
+  <label class="bb-check-row"><input type="checkbox" id="bbTsEnabled">显示时间戳</label><div class="bb-muted">在聊天消息中显示时间信息</div>
+  <div class="bb-section-title">智能显示间隔：<span id="bbTsGapLabel">5</span> 分钟</div><div class="bb-range-row"><span>1</span><input id="bbTsGap" type="range" min="1" max="60" value="5" oninput="bbTsGapLabel.textContent=this.value"><span>60</span></div>
+  <div class="bb-section-title">时间戳位置</div>
+  <div class="bb-choice" data-ts-pos="center" onclick="chooseTimestampPosition('center')"><b>居中显示</b><span>间隔达到设定时间后，在聊天中间显示一次</span></div>
+  <div class="bb-choice" data-ts-pos="outside" onclick="chooseTimestampPosition('outside')"><b>气泡外侧</b><span>时间显示在每条消息气泡外侧</span></div>
+  <div class="bb-choice" data-ts-pos="avatar" onclick="chooseTimestampPosition('avatar')"><b>头像下方</b><span>时间显示在头像正下方</span></div>
+  <div class="bb-choice" data-ts-pos="inside" onclick="chooseTimestampPosition('inside')"><b>气泡内</b><span>时间显示在气泡内右下角</span></div>
+ </div><div class="bb-footer"><button class="bb-cancel" onclick="closeTimestampSettings()">取消</button><button class="bb-save" onclick="saveTimestampSettings()">保存</button></div>
+</div></div>
+<div class="bb-sheet-mask" id="bbBlacklistMask" onclick="if(event.target===this)closeBlacklistSettings()"><div class="bb-sheet">
+ <div class="bb-sheet-head"><div class="bb-sheet-title">拉黑管理</div><div class="bb-sheet-close" onclick="closeBlacklistSettings()">×</div></div>
+ <div class="bb-sheet-body">
+  <div class="bb-section-title">当前状态</div><div class="bb-status-card"><div class="bb-status-row"><b>你对角色的拉黑状态</b><span id="bbMyBlockStatus">正常聊天中</span></div><div class="bb-status-row"><b>角色对你的拉黑状态</b><span id="bbRoleBlockStatus">正常聊天中</span></div></div>
+  <div class="bb-section-title" style="color:#e13c3c">操作</div><div class="bb-danger-card"><b id="bbBlockActionTitle">拉黑此角色</b><div class="bb-muted" id="bbBlockActionDesc">拉黑后微信消息会被拒收，角色可能改用短信联系、解释或挽回。</div><button id="bbBlockBtn" class="bb-danger-btn" onclick="toggleCurrentBlacklist()">拉黑此角色</button></div>
+ </div><div class="bb-footer"><button class="bb-cancel" onclick="closeBlacklistSettings()">关闭</button></div>
+</div></div>
+
+
+
+<div class="bb-tool-backdrop" id="bbToolBackdrop" onclick="closeBaobaoTools()"></div>
+<div class="bb-tool-sheet" id="bbToolSheet">
+  <div class="bb-tool-grid">
+    <div class="bb-tool-item" onclick="openBaobaoToolModal('voice')"><div class="bb-tool-icon">🎙</div>语音</div>
+    <div class="bb-tool-item" onclick="openBaobaoCamera()"><div class="bb-tool-icon">📷</div>拍照</div>
+    <div class="bb-tool-item" onclick="openBaobaoImageChoice()"><div class="bb-tool-icon">🖼</div>图片</div>
+    <div class="bb-tool-item" onclick="openBaobaoToolModal('location')"><div class="bb-tool-icon">📍</div>位置</div>
+    <div class="bb-tool-item" onclick="openBaobaoToolModal('transfer')"><div class="bb-tool-icon">💸</div>转账</div>
+  </div>
+</div>
+<input id="bbCameraInput" type="file" accept="image/*" capture="environment" hidden>
+<input id="bbAlbumInput" type="file" accept="image/*" hidden>
+
+<div class="bb-tool-modal" id="bbToolModal" onclick="if(event.target===this)closeBaobaoToolModal()">
+ <div class="bb-tool-card">
+  <div id="bbToolModalContent"></div>
+ </div>
+</div>
+
+
+
+
+
+<div class="ar-overlay" id="antiReconOverlay">
+  <div class="ar-settings" id="antiReconSettings">
+    <div class="ar-topbar"><div class="ar-back" onclick="closeAntiRecon()">‹</div><div class="ar-top-title">反侦察</div><div class="ar-top-spacer"></div></div>
+    <div class="ar-hero"><div class="ar-hero-kicker">COUNTER SURVEILLANCE</div><div class="ar-hero-title">谁在动我的手机</div><div class="ar-hero-desc">角色可以主动提出查看你的豹豹机，并根据真正看到的聊天、朋友圈和联系人留下记忆。</div></div>
+    <div class="ar-group">
+      <div class="ar-row"><div class="ar-row-main"><div class="ar-row-title">允许角色自主侦察</div><div class="ar-row-sub">与主设置共用一个总开关；关闭后只能手动触发</div></div><label class="ar-switch"><input id="arAllow" type="checkbox"><span></span></label></div>
+      <div class="ar-row"><div class="ar-row-main"><div class="ar-row-title">查之前先询问</div><div class="ar-row-sub">关闭后角色可能突然拿走手机</div></div><label class="ar-switch"><input id="arAsk" type="checkbox"><span></span></label></div>
+      <div class="ar-row"><div class="ar-row-main"><div class="ar-row-title">开启抢手机互动</div><div class="ar-row-sub">关键内容打开前会出现短暂抢回机会</div></div><label class="ar-switch"><input id="arGrab" type="checkbox"><span></span></label></div>
+    </div>
+    <div class="ar-permissions" id="arPermissions">
+      <div class="ar-permission" data-key="chat"><b>聊天记录</b><small>查看最近聊天对象和片段</small></div>
+      <div class="ar-permission" data-key="moments"><b>朋友圈</b><small>查看你的动态与互动</small></div>
+      <div class="ar-permission" data-key="contacts"><b>联系人</b><small>查看你创建的其他角色</small></div>
+      <div class="ar-permission" data-key="album"><b>相册</b><small>查看动态和组件中的照片</small></div>
+      <div class="ar-permission" data-key="me"><b>我的资料</b><small>昵称、微信号、钱包和表情包</small></div>
+      <div class="ar-permission" data-key="activity"><b>使用记录</b><small>查看你真正打开过的豹豹机页面</small></div>
+    </div>
+    <button class="ar-test" onclick="startAntiReconRequest(true)">立即体验一次</button>
+    <div class="ar-note">这是豹豹机内部的沉浸式模拟，不会读取你真实 iPhone 里的内容。</div>
+  </div>
+
+  <div class="ar-request" id="antiReconRequest">
+    <div class="ar-request-head"><div class="ar-request-avatar" id="arRequestAvatar"></div><div class="ar-request-copy"><div class="ar-request-name" id="arRequestName">对方想查看你的手机</div><div class="ar-request-text">你只有几秒钟决定怎么做</div></div><div class="ar-count" id="arCount">5</div></div>
+    <div class="ar-request-actions"><button class="ar-request-btn" onclick="antiReconChoice('watch')">偷偷看</button><button class="ar-request-btn" onclick="antiReconChoice('hide')">藏起来</button><button class="ar-request-btn primary" onclick="antiReconChoice('give')">直接递给他</button></div>
+  </div>
+
+  <div class="ar-session" id="antiReconSession">
+    <div class="ar-session-top"><div class="ar-live"><span class="ar-live-dot"></span><span id="arLiveText">正在查看你的手机</span></div><div class="ar-stop" onclick="forceStopAntiRecon()">强行拿回</div></div>
+    <div class="ar-session-body"><div class="ar-role-avatar" id="arRoleAvatar"></div><div class="ar-role-name" id="arRoleName"></div><div class="ar-status" id="arStatus"></div><div class="ar-phone-card"><div class="ar-progress"><div class="ar-progress-fill" id="arProgress"></div></div><div class="ar-log" id="arLog"></div></div></div>
+    <div class="ar-grab-wrap"><button class="ar-grab" id="arGrabBtn" onclick="grabPhoneBack()">抢回来！！</button><div class="ar-grab-timer" id="arGrabTimer"></div></div>
+  </div>
+
+  <div class="ar-result" id="antiReconResult"><div class="ar-result-card"><div class="ar-result-icon" id="arResultIcon">✓</div><div class="ar-result-title" id="arResultTitle"></div><div class="ar-result-text" id="arResultText"></div><button class="ar-result-btn" onclick="finishAntiRecon()">知道了</button></div></div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="ar2-overlay" id="antiReconV2">
+  <div class="ar2-top">
+    <span class="ar2-live-dot"></span>
+    <div><div class="ar2-title" id="ar2Title">对方正在查看你的豹豹机</div><div class="ar2-sub" id="ar2Sub">实时画面 · 第二阶段</div></div>
+    <div class="ar2-force" onclick="ar2ForceBack()">强行拿回</div>
+  </div>
+  <div class="ar2-stage">
+    <div class="ar2-phone" id="ar2Phone">
+      <div class="ar2-screen" id="ar2ChatScreen"><div class="ar2-screen-head">聊天 <small>正在翻看</small></div><div class="ar2-list" id="ar2ChatList"></div></div>
+      <div class="ar2-screen" id="ar2ContactsScreen"><div class="ar2-screen-head">联系人 <small>正在查看</small></div><div class="ar2-contact-grid" id="ar2Contacts"></div></div>
+      <div class="ar2-screen" id="ar2MomentsScreen"><div class="ar2-screen-head">朋友圈 <small>正在下滑</small></div><div class="ar2-list" id="ar2Moments"></div></div>
+      <div class="ar2-screen" id="ar2AlbumScreen"><div class="ar2-screen-head">相册 <small>正在放大照片</small></div><div class="ar2-album" id="ar2Album"></div></div>
+      <div class="ar2-screen" id="ar2MeScreen"><div class="ar2-screen-head">我的 <small>正在核对资料</small></div><div class="ar2-list" id="ar2Me"></div></div>
+      <div class="ar2-screen" id="ar2ActivityScreen"><div class="ar2-screen-head">使用记录 <small>正在查看痕迹</small></div><div class="ar2-list" id="ar2Activity"></div></div>
+      <div class="ar2-spybar"><div class="ar2-status" id="ar2Status">正在打开聊天…</div><div class="ar2-detail" id="ar2Detail">角色会读取豹豹机内的真实模拟数据</div><div class="ar2-progress"><i id="ar2Progress"></i></div></div>
+    </div>
+  </div>
+  <div class="ar2-bottom"><button class="ar2-grab" id="ar2Grab" onclick="ar2GrabBack()">抢回来！！</button><div class="ar2-grab-note" id="ar2GrabNote">危险内容出现时会短暂开放抢手机按钮</div></div>
+</div>
+
+<div class="ar2-settings" id="antiReconV2Settings">
+  <div class="ar2-back" onclick="closeAntiReconV2Settings()">‹</div>
+  <h1>反侦察</h1>
+  <div class="ar2-command-card">
+    <div class="ar2-command-kicker">FORCE RECONNAISSANCE</div>
+    <div class="ar2-command-title">让他现在侦察</div>
+    <div class="ar2-command-desc">不等待怀疑值和随机触发，当前聊天角色会立刻自动翻查你的豹豹机真实内部数据。</div>
+    <button class="ar2-command-now" onclick="forceAntiReconNow()">开始侦察</button>
+  </div>
+  <div class="ar2-card">
+    <div class="ar2-setting-row"><div class="ar2-setting-main"><div class="ar2-setting-title">允许角色自主侦察</div><div class="ar2-setting-desc">总开关；关闭时绝不会自动查，只能手动测试。开启后最短间隔 2 小时</div></div><div class="ar2-switch" id="ar2AutoSwitch" onclick="ar2Toggle('auto')"></div></div>
+    <div class="ar2-setting-row"><div class="ar2-setting-main"><div class="ar2-setting-title">抢手机互动</div><div class="ar2-setting-desc">看到聊天和相册时出现限时按钮</div></div><div class="ar2-switch" id="ar2GrabSwitch" onclick="ar2Toggle('grab')"></div></div>
+    <div class="ar2-setting-row"><div class="ar2-setting-main"><div class="ar2-setting-title">查完写入角色记忆</div><div class="ar2-setting-desc">以后回复时可以提起看到的内容</div></div><div class="ar2-switch" id="ar2MemorySwitch" onclick="ar2Toggle('memory')"></div></div>
+  </div>
+  <div class="ar2-card"><div class="ar2-setting-row"><div class="ar2-setting-main"><div class="ar2-setting-title">当前怀疑值</div><div class="ar2-setting-desc" id="ar2SuspicionText">0 / 100</div></div></div></div>
+  <button class="ar2-test" onclick="openAntiReconV1Settings()">第一阶段：询问、藏起来或递给他</button>
+  <button class="ar2-test" style="margin-top:10px" onclick="startAntiReconV2(true)">第二阶段：实时查看</button>
+</div>
+
+<div class="ar2-result" id="ar2Result"><div class="ar2-result-card"><div class="ar2-result-icon" id="ar2ResultIcon">✓</div><div class="ar2-result-title" id="ar2ResultTitle"></div><div class="ar2-result-text" id="ar2ResultText"></div><button class="ar2-result-btn" onclick="ar2Finish()">知道了</button></div></div>
+
+
+
+
+<div class="ar3-night" id="antiReconV3Night">
+  <div class="ar3-clock"><div class="ar3-time" id="ar3Time">23:47</div><div class="ar3-date" id="ar3Date">豹豹机已锁定</div></div>
+  <div class="ar3-lock-card">
+    <div class="ar3-lock-head"><div class="ar3-lock-avatar" id="ar3Avatar">人</div><div><div class="ar3-lock-name" id="ar3Name">对方正在尝试解锁</div><div class="ar3-lock-sub">隐蔽查看 · 你暂时不会收到提示</div></div></div>
+    <div class="ar3-lock-status" id="ar3Status">他拿起了桌上的豹豹机。</div>
+    <div class="ar3-dots" id="ar3Dots"><i class="ar3-dot"></i><i class="ar3-dot"></i><i class="ar3-dot"></i><i class="ar3-dot"></i></div>
+    <div class="ar3-keypad">
+      <div class="ar3-key">1</div><div class="ar3-key">2</div><div class="ar3-key">3</div>
+      <div class="ar3-key">4</div><div class="ar3-key">5</div><div class="ar3-key">6</div>
+      <div class="ar3-key">7</div><div class="ar3-key">8</div><div class="ar3-key">9</div>
+      <div></div><div class="ar3-key">0</div><div></div>
+    </div>
+  </div>
+  <div class="ar3-foot">第三阶段 · 锁屏潜入模拟</div>
+  <div class="ar3-shadow" id="ar3Shadow"><div class="ar3-shadow-card"><div class="ar3-shadow-icon">◉</div><div class="ar3-shadow-title" id="ar3ShadowTitle">解锁成功</div><div class="ar3-shadow-text" id="ar3ShadowText">他没有留下即时提示。</div></div></div>
+</div>
+
+<div class="ar3-log" id="antiReconV3Log">
+  <div class="ar3-log-back" onclick="closeAntiReconV3Log()">‹</div>
+  <h1>异常记录</h1>
+  <div class="ar3-mode-badge">◉ 第三阶段已开启</div>
+  <div id="ar3LogList"></div>
+</div>
+
+<div class="ar3-notice" id="ar3Notice" onclick="openAntiReconV3Log()">
+  <div class="ar3-notice-icon">◉</div>
+  <div class="ar3-notice-main"><div class="ar3-notice-title">发现一条异常使用记录</div><div class="ar3-notice-text" id="ar3NoticeText">昨晚有人解锁过你的豹豹机。</div></div>
+  <div class="ar3-notice-btn">查看</div>
+</div>
+
+
+
+
+<div class="memv1-panel" id="memoryV1Panel">
+  <div class="memv1-back" onclick="closeMemoryV1()">‹</div>
+  <div class="memv1-title">记忆总结</div>
+  <div class="memv1-sub">长期保存 · 每个角色独立 · 仅手动标记的事实允许全角色共享</div>
+  <div class="memv1-hero">
+    <div class="memv1-person">
+      <div class="memv1-avatar" id="memv1Avatar">人</div>
+      <div><div class="memv1-name" id="memv1Name">当前角色</div><div class="memv1-count" id="memv1Count">0 条长期记忆</div></div>
+    </div>
+    <div class="memv1-summary" id="memv1Summary">还没有形成关系总结。</div>
+    <div class="memv1-stats">
+      <div class="memv1-stat"><b id="memv1Permanent">0</b><span>永久记忆</span></div>
+      <div class="memv1-stat"><b id="memv1Hidden">0</b><span>隐性记忆</span></div>
+      <div class="memv1-stat"><b id="memv1Injected">0</b><span>本次可调用</span></div>
+    </div>
+  </div>
+  <div class="memv1-toolbar">
+    <button class="memv1-btn primary" id="memv1SummarizeBtn" onclick="memoryV1SummarizeNow()">AI 总结聊天</button>
+    <button class="memv1-btn" onclick="openMemoryV1Add()">手动添加记忆</button>
+  </div>
+  <input class="memv1-search" id="memv1Search" placeholder="搜索记忆内容…" oninput="renderMemoryV1()">
+  <div class="memv1-tabs">
+    <div class="memv1-tab active" data-tab="all" onclick="memoryV1SetTab(this)">全部</div>
+    <div class="memv1-tab" data-tab="profile" onclick="memoryV1SetTab(this)">关于我</div>
+    <div class="memv1-tab" data-tab="event" onclick="memoryV1SetTab(this)">重要事件</div>
+    <div class="memv1-tab" data-tab="relationship" onclick="memoryV1SetTab(this)">我们之间</div>
+    <div class="memv1-tab" data-tab="hidden" onclick="memoryV1SetTab(this)">隐性记忆</div>
+    <div class="memv1-tab" data-tab="shared" onclick="memoryV1SetTab(this)">明确共享</div>
+    <div class="memv1-tab" data-tab="pinned" onclick="memoryV1SetTab(this)">永久固定</div>
+  </div>
+  <div id="memv1List"></div>
+</div>
+
+<div class="memv1-addsheet" id="memoryV1AddSheet" onclick="if(event.target===this)closeMemoryV1Add()">
+  <div class="memv1-sheet">
+    <h3 id="memv1SheetTitle">添加长期记忆</h3>
+    <select class="memv1-select" id="memv1AddType">
+      <option value="profile">关于我</option><option value="event">重要事件</option>
+      <option value="relationship">我们之间</option><option value="hidden">隐性记忆</option>
+      <option value="shared">全角色共享（仅明确需要时选择）</option>
+    </select>
+    <textarea class="memv1-textarea" id="memv1AddText" placeholder="例如：用户很怕打雷，听见雷声时需要陪伴。"></textarea>
+    <select class="memv1-select" id="memv1AddImportance">
+      <option value="5">重要度 5 · 长期</option><option value="7">重要度 7 · 很重要</option>
+      <option value="9">重要度 9 · 核心</option><option value="10">重要度 10 · 永久</option>
+    </select>
+    <div class="memv1-sheet-actions"><button class="memv1-cancel" onclick="closeMemoryV1Add()">取消</button><button class="memv1-save" onclick="saveMemoryV1Manual()">保存</button></div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ===== 豹豹机：聊天流畅修复（最终覆盖） ===== -->
+
+
+
+<!-- ===== 豹豹机：仅修复多条消息卡顿 v2 ===== -->
+
+
+
+
+
+
+
+
+
+
+<!-- index(178)：修复查手机角色卡片被拉成长条，移除角色手机页右上角灰色圆点 -->
+
+
+<!-- 豹豹机 AI 后端接口配置预留 v4.9 -->
+
+
+<!-- 图片识别（视觉API）接入：用户发送真实照片后，异步调用视觉模型生成文字描述，
+     并在 AI 生成回复时把这段描述临时"顶替"进图片消息里，让模型能读懂图片内容。
+     不改动任何已有渲染/存储逻辑，只在请求接口这一步做临时替换，用完立刻还原。 -->
+
+
+<!-- ===== 豹豹机 4.9 中转站最终测试整合层 v153 ===== -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- index(173)：修复反侦察点击穿透，只有正式入口可打开，锁屏数字键与其他按钮不再误触 -->
+
+<!-- index(215)：保留角色表情包转换与历史修复，移除韩系表情包内置入口 -->
+
+
+<!-- index(211)：表情包面板美化、智能推荐与智能跟发表情；聊天图片缩小可点开；强制刷新桌面图标主题 -->
+
+
+<!-- index(212)：真正替换桌面像素图标；角色表情包不再先闪源码；聊天照片缩小并可点开放大 -->
+<div id="bbMediaViewerV212" onclick="if(event.target===this)closeBaobaoMediaViewerV212()">
+  <button type="button" class="bb-media-close" onclick="closeBaobaoMediaViewerV212()">×</button>
+  <img id="bbMediaViewerImageV212" alt="图片预览">
+  <div class="bb-media-hint">点空白处关闭</div>
+</div>
+
+
+
+<!-- index(265)：数据性能顺滑版。聊天仅渲染最近一段，保存操作合并执行；不删除聊天、人设或导入数据。 -->
+
+
+<!-- index(281)：以用户上传的 index(280) 为底稿制作 GitHub Pages 单文件测试版。 -->
+
+<!-- index(315)：人设读取强化；每轮先从完整人物资料提取相关锚点，涉及角色生活、经历、习惯、偏好与关系时必须自然调用具体内容，不再只模仿语气。 -->
+<!-- index(316)：AI 生图新增“读取当前角色人设外貌”，可按角色外貌与气质自动生成头像、自拍、全身图和生活照。 -->
+
+<script>
+/* baobao-v357-desktop-icon-fit-and-fill */
+(function(){
+  "use strict";
+  if(window.__bbV357DesktopIconFit)return;
+  window.__bbV357DesktopIconFit=true;
+
+  const STYLE_ID='bbV357DesktopIconFitStyle';
+  let busy=false;
+
+  function ensureStyle(){
+    let style=document.getElementById(STYLE_ID);
+    if(!style){
+      style=document.createElement('style');
+      style.id=STYLE_ID;
+    }
+    style.textContent=`
+      html body #desktop .apps-page>.app{
+        display:flex!important;
+        flex-direction:column!important;
+        align-items:center!important;
+        justify-content:flex-start!important;
+        height:96px!important;
+        min-height:96px!important;
+      }
+      html body #desktop .apps-page>.app .icon{
+        width:60px!important;
+        height:60px!important;
+        margin:0 auto 8px!important;
+        border-radius:15px!important;
+        overflow:hidden!important;
+        display:flex!important;
+        align-items:center!important;
+        justify-content:center!important;
+        flex:0 0 auto!important;
+      }
+      html body #desktop .apps-page>.app .icon>img{
+        width:110%!important;
+        height:110%!important;
+        object-fit:contain!important;
+        object-position:center!important;
+        display:block!important;
+        transform:scale(1.02)!important;
+      }
+      html body #desktop .apps-page>.app .icon>svg{
+        width:82%!important;
+        height:82%!important;
+        display:block!important;
+      }
+      html body #desktop .apps-page>.app{
+        font-size:13px!important;
+        line-height:1.15!important;
+      }
+      html body #desktop:not(.page-two-mode) .apps-page:not(.page2-only){
+        grid-template-rows:repeat(2,96px)!important;
+        column-gap:8px!important;
+        row-gap:14px!important;
+        padding:44px 16px 0!important;
+      }
+      html body #desktop.page-two-mode .apps-page,
+      html body #desktop .apps-page.page2-only{
+        column-gap:8px!important;
+        row-gap:14px!important;
+        padding-left:16px!important;
+        padding-right:16px!important;
+      }
+      html body #desktop .dock>.dock-icon{
+        width:60px!important;
+        min-width:60px!important;
+        height:76px!important;
+        display:flex!important;
+        flex-direction:column!important;
+        align-items:center!important;
+        justify-content:flex-start!important;
+      }
+      html body #desktop .dock .dock-symbol{
+        width:48px!important;
+        height:48px!important;
+        border-radius:15px!important;
+        overflow:hidden!important;
+        display:flex!important;
+        align-items:center!important;
+        justify-content:center!important;
+        flex:0 0 auto!important;
+      }
+      html body #desktop .dock .dock-symbol>img{
+        width:110%!important;
+        height:110%!important;
+        object-fit:contain!important;
+        object-position:center!important;
+        display:block!important;
+        transform:scale(1.02)!important;
+      }
+      html body #desktop .dock .dock-symbol>svg{
+        width:82%!important;
+        height:82%!important;
+        display:block!important;
+      }
+      html body #desktop .dock small{
+        margin-top:6px!important;
+        font-size:13px!important;
+        line-height:1.08!important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function tuneAppIcon(app){
+    if(!app)return;
+    app.style.setProperty('height','96px','important');
+    app.style.setProperty('min-height','96px','important');
+    app.style.setProperty('justify-content','flex-start','important');
+    const icon=app.querySelector('.icon');
+    if(icon){
+      icon.style.setProperty('width','60px','important');
+      icon.style.setProperty('height','60px','important');
+      icon.style.setProperty('margin','0 auto 8px','important');
+      icon.style.setProperty('border-radius','16px','important');
+      icon.style.setProperty('overflow','hidden','important');
+      icon.style.setProperty('display','flex','important');
+      icon.style.setProperty('align-items','center','important');
+      icon.style.setProperty('justify-content','center','important');
+      const img=icon.querySelector('img');
+      if(img){
+        img.style.setProperty('width','110%','important');
+        img.style.setProperty('height','110%','important');
+        img.style.setProperty('object-fit','contain','important');
+        img.style.setProperty('object-position','center','important');
+        img.style.setProperty('display','block','important');
+        img.style.setProperty('transform','scale(1.02)','important');
+      }
+      const svg=icon.querySelector('svg');
+      if(svg){
+        svg.style.setProperty('width','82%','important');
+        svg.style.setProperty('height','82%','important');
+        svg.style.setProperty('display','block','important');
+      }
+    }
+  }
+
+  function tuneDockIcon(item){
+    if(!item)return;
+    item.style.setProperty('width','64px','important');
+    item.style.setProperty('min-width','64px','important');
+    item.style.setProperty('height','72px','important');
+    item.style.setProperty('display','flex','important');
+    item.style.setProperty('flex-direction','column','important');
+    item.style.setProperty('align-items','center','important');
+    item.style.setProperty('justify-content','flex-start','important');
+    const box=item.querySelector('.dock-symbol');
+    if(box){
+      box.style.setProperty('width','48px','important');
+      box.style.setProperty('height','48px','important');
+      box.style.setProperty('border-radius','15px','important');
+      box.style.setProperty('overflow','hidden','important');
+      box.style.setProperty('display','flex','important');
+      box.style.setProperty('align-items','center','important');
+      box.style.setProperty('justify-content','center','important');
+      const img=box.querySelector('img');
+      if(img){
+        img.style.setProperty('width','110%','important');
+        img.style.setProperty('height','110%','important');
+        img.style.setProperty('object-fit','contain','important');
+        img.style.setProperty('object-position','center','important');
+        img.style.setProperty('display','block','important');
+        img.style.setProperty('transform','scale(1.02)','important');
+      }
+      const svg=box.querySelector('svg');
+      if(svg){
+        svg.style.setProperty('width','82%','important');
+        svg.style.setProperty('height','82%','important');
+        svg.style.setProperty('display','block','important');
+      }
+    }
+    const small=item.querySelector('small');
+    if(small){
+      small.style.setProperty('margin-top','6px','important');
+      small.style.setProperty('font-size','13px','important');
+      small.style.setProperty('line-height','1.08','important');
+    }
+  }
+
+  function enforce(){
+    ensureStyle();
+    const desktop=document.getElementById('desktop');
+    if(!desktop)return;
+    desktop.querySelectorAll('.apps-page').forEach(page=>{
+      page.style.setProperty('column-gap','8px','important');
+      page.style.setProperty('row-gap','14px','important');
+      page.style.setProperty('padding-left','16px','important');
+      page.style.setProperty('padding-right','16px','important');
+      if(!desktop.classList.contains('page-two-mode')&&!page.classList.contains('page2-only')){
+        page.style.setProperty('padding-top','44px','important');
+      }
+    });
+    desktop.querySelectorAll('.apps-page>.app').forEach(tuneAppIcon);
+    desktop.querySelectorAll('.dock>.dock-icon').forEach(tuneDockIcon);
+  }
+
+  function schedule(){
+    if(busy)return;
+    busy=true;
+    requestAnimationFrame(()=>{busy=false;enforce();});
+  }
+
+  function install(){
+    enforce();
+    const pages=document.getElementById('pagesContainer');
+    if(pages&&!pages.__bbV357Observer){
+      pages.__bbV357Observer=new MutationObserver(schedule);
+      pages.__bbV357Observer.observe(pages,{childList:true,subtree:true});
+    }
+    const desktop=document.getElementById('desktop');
+    if(desktop&&!desktop.__bbV357DesktopObserver){
+      desktop.__bbV357DesktopObserver=new MutationObserver(schedule);
+      desktop.__bbV357DesktopObserver.observe(desktop,{childList:true,subtree:true});
+    }
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});
+  else install();
+  window.addEventListener('load',install);
+  window.addEventListener('pageshow',install);
+  [0,180,900].forEach(ms=>setTimeout(install,ms));
+})();
+</script>
+
+<script id="bb-chat-message-home-v373-script">
+(function(){
+  function ensureState(){
+    if(!window.state) window.state={};
+    if(!Array.isArray(window.state.chatLandingPhotos)) window.state.chatLandingPhotos=["","",""];
+  }
+  function getEl(id){ return document.getElementById(id); }
+  function render(){
+    ensureState();
+    var photos=window.state.chatLandingPhotos;
+    for(var i=0;i<3;i++){
+      var el=getEl('chatLandingPhoto'+i);
+      if(!el) continue;
+      var url=photos[i]||'';
+      el.style.backgroundImage=url?('url('+url+')'):'linear-gradient(180deg,#ececf1,#dbdbe2)';
+      el.classList.toggle('has-image',!!url);
+      el.classList.toggle('empty',!url);
+    }
+  }
+  window.bbOpenChatLandingPhoto=function(index){
+    ensureState();
+    window.__bbChatLandingPhotoIndex=index;
+    var input=getEl('chatLandingPhotoInput');
+    if(input) input.click();
+  };
+  window.bbHandleChatLandingPhoto=function(input){
+    if(!input || !input.files || !input.files[0]) return;
+    ensureState();
+    var idx=Number(window.__bbChatLandingPhotoIndex||0);
+    var file=input.files[0];
+    var reader=new FileReader();
+    reader.onload=function(e){
+      window.state.chatLandingPhotos[idx]=String(e.target.result||'');
+      try{ if(typeof saveLocal==='function') saveLocal(); }catch(error){}
+      render();
+    };
+    reader.readAsDataURL(file);
+    input.value='';
+  };
+  window.bbRenderChatLandingPhotos=render;
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(render, 50);
+    setTimeout(render, 500);
+  });
+  window.addEventListener('load', function(){ setTimeout(render, 200); });
+})();
+</script>
+
+
+<script id="bb-chat-overlay-fix-v374-script">
+(function(){
+  function syncChatTabState(){
+    var root=document.getElementById('chatDemo');
+    if(!root) return;
+    var items=root.querySelectorAll('.app-tabbar-item');
+    var tabs=root.querySelectorAll('.app-tab-content');
+    var activeId='tabChat';
+    items.forEach(function(it){ if(it.classList.contains('active')) activeId=it.getAttribute('data-tab')||activeId; });
+    tabs.forEach(function(tab){
+      var on=tab.id===activeId;
+      tab.style.display=on?'block':'none';
+      tab.classList.toggle('bb-active',on);
+      tab.setAttribute('data-active', on ? 'true':'false');
+    });
+  }
+  var oldSwitch=window.switchAppTab;
+  window.switchAppTab=function(tabId){
+    if(typeof oldSwitch==='function'){
+      try{ oldSwitch(tabId); }catch(e){}
+    }
+    var root=document.getElementById('chatDemo');
+    if(root){
+      root.querySelectorAll('.app-tabbar-item').forEach(function(el){
+        el.classList.toggle('active', el.getAttribute('data-tab')===tabId);
+      });
+      root.querySelectorAll('.app-tab-content').forEach(function(el){
+        var on=el.id===tabId;
+        el.style.display=on?'block':'none';
+        el.classList.toggle('bb-active',on);
+        el.setAttribute('data-active', on ? 'true':'false');
+      });
+    }
+  };
+  var oldOpen=window.openChatRoom;
+  if(typeof oldOpen==='function'){
+    window.openChatRoom=function(){
+      var root=document.getElementById('chatDemo');
+      if(root) root.classList.add('bb-chat-room-open');
+      return oldOpen.apply(this, arguments);
+    };
+  }
+  var oldClose=window.closeChatRoom;
+  if(typeof oldClose==='function'){
+    window.closeChatRoom=function(){
+      var res=oldClose.apply(this, arguments);
+      var root=document.getElementById('chatDemo');
+      if(root) root.classList.remove('bb-chat-room-open');
+      syncChatTabState();
+      return res;
+    };
+  }
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(syncChatTabState, 60); });
+  window.addEventListener('load', function(){ setTimeout(syncChatTabState, 180); });
+})();
+</script>
+
+
+<script id="bb-chat-polish-v375-script">
+(function(){
+  function blockDecorativeChatRow(){
+    var root=document.getElementById('chatDemo');
+    if(!root || root.__bbDecorativeChatRow375)return;
+    root.__bbDecorativeChatRow375=true;
+    root.addEventListener('click',function(event){
+      var row=event.target && event.target.closest ? event.target.closest('.bb-chat-self-row') : null;
+      if(!row)return;
+      event.preventDefault();
+      event.stopPropagation();
+      if(event.stopImmediatePropagation)event.stopImmediatePropagation();
+    },true);
+    root.addEventListener('contextmenu',function(event){
+      var row=event.target && event.target.closest ? event.target.closest('.bb-chat-self-row') : null;
+      if(!row)return;
+      event.preventDefault();
+      event.stopPropagation();
+    },true);
+  }
+  document.addEventListener('DOMContentLoaded',function(){setTimeout(blockDecorativeChatRow,60);});
+  window.addEventListener('load',function(){setTimeout(blockDecorativeChatRow,180);});
+})();
+</script>
+
+<style id="bugfix-page2-widgets-baseline-v411">
+/* ===================================================================
+   修复：第二页底部的两个小组件（资料卡"new here" / 歌曲卡"our song"）
+   的全部尺寸/定位样式，此前只写在 "#desktop.page-two-mode ..." 这个
+   前缀选择器下面——但这两个组件的 DOM 其实一直存在（不管当前在第几页），
+   一旦 page-two-mode 这个 class 因为任何原因（加载时机、页面切换过程中
+   的瞬间状态等）没有及时挂上，这些组件就会完全没有样式：卡片里的图片用
+   原始像素尺寸（1015×830）撑开，导致卡片高度暴涨到 900 多像素，被父容器
+   overflow:hidden 从中间硬生生切开，就是你截图里看到的"压扁的两条"。
+   这里补一版不依赖 page-two-mode 前缀的兜底样式，保证不管什么状态下，
+   这两个组件都不会失控地撑开高度。真正激活时（page-two-mode 存在），
+   原有那份 !important 的样式选择器优先级更高，会继续生效，不受影响。 ---- */
+.p2-bottom-widgets{
+  position:absolute;
+  left:14px;right:14px;
+  top:398px;
+  height:354px;
+  display:flex;
+  align-items:flex-start;
+  overflow:visible;
+  box-sizing:border-box;
+}
+.p2-mini-profile-card,
+.p2-mini-song-card{
+  position:relative;
+  overflow:hidden;
+  height:auto;
+  box-sizing:border-box;
+}
+.p2-mini-profile-card{width:54%;aspect-ratio:1015/830}
+.p2-mini-song-card{width:43%;aspect-ratio:830/930}
+.p2-mini-frame{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  display:block;
+}
+</style>
+<script>
+/* 修复：.pages-viewport / .pages-container 的 overflow 属性被多个历史补丁
+   反复用 !important 设置成互相矛盾的 visible / hidden，最终生效哪一个
+   取决于这些 <style> 标签被插入 DOM 的先后顺序，属于不稳定的竞态问题。
+   这里在所有脚本执行完毕后，再追加一条样式，确保 overflow:hidden 一定
+   是最后生效的规则，避免任何超尺寸的内容意外露到可见区域之外。 */
+(function(){
+  function applyFinalOverflowFix(){
+    var s = document.createElement('style');
+    s.id = 'bugfix-pages-overflow-final-v411';
+    s.textContent = [
+      '#desktop:not(.page-two-mode) .pages-viewport,#desktop:not(.page-two-mode) .pages-container{overflow:hidden!important}',
+      '#desktop.page-two-mode .pages-viewport,#desktop.page-two-mode .pages-container,#desktop.page-two-mode .apps-page.page2-only,#desktop.page-two-mode .p2-bottom-widgets{overflow:visible!important}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+  if(document.readyState === 'complete'){
+    applyFinalOverflowFix();
+  }else{
+    window.addEventListener('load', applyFinalOverflowFix);
+  }
+})();
+</script>
+<script>
+/* 修复：私聊页顶部导航栏和底部输入栏与真实屏幕边缘之间总是留着一截
+   空白（不是安全区，是额外叠加的 padding/margin），这块空白会正好挡住
+   最上面和最下面的消息，看起来像消息被裁掉了。
+   历史补丁里给 #chatRoom 加了好几层 "padding-top: 92px+安全区" 这类
+   叠加值，这里同样在所有脚本执行完之后，追加一条最终生效的样式，
+   让顶部导航栏和底部输入栏真正贴住屏幕边缘（只保留系统安全区，不再有
+   额外空白），中间消息区域精确填满剩下的空间。 */
+(function(){
+  function applyChatEdgeFix(){
+    var s = document.createElement('style');
+    s.id = 'bugfix-chatroom-edge-flush-v411';
+    s.textContent = [
+      '#chatRoom{padding:0!important}',
+      '#chatRoom .chat-head{',
+        'position:absolute!important;top:0!important;left:0!important;right:0!important;',
+        'padding-top:env(safe-area-inset-top)!important;',
+        'height:calc(56px + env(safe-area-inset-top))!important;',
+        'box-sizing:border-box!important;',
+      '}',
+      '#chatRoom .chat-input-bar{',
+        'position:absolute!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;',
+        'padding-bottom:calc(10px + env(safe-area-inset-bottom))!important;',
+        'padding-top:10px!important;',
+        'box-sizing:border-box!important;',
+      '}',
+      '#chatRoom .chat-msgs{',
+        'position:absolute!important;left:0!important;right:0!important;',
+        'top:calc(56px + env(safe-area-inset-top))!important;',
+        'bottom:calc(64px + env(safe-area-inset-bottom))!important;',
+        'box-sizing:border-box!important;',
+      '}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+  if(document.readyState === 'complete'){
+    applyChatEdgeFix();
+  }else{
+    window.addEventListener('load', applyChatEdgeFix);
+  }
+})();
+</script>
+
+<script>
+/* 豹豹机：聊天上下贴边 + CSS 预设首次清空 */
+(function(){
+  'use strict';
+  const CLEAR_MARK='bb_empty_css_preset_migration_v3';
+
+  function clearOldCssOnce(){
+    if(localStorage.getItem(CLEAR_MARK)==='1') return;
+    localStorage.removeItem('bb_bubble_css_presets_v290');
+    localStorage.removeItem('bb_active_bubble_preset_v290');
+    localStorage.removeItem('bb_custom_bubble_css');
+    localStorage.setItem(CLEAR_MARK,'1');
+    const old=document.getElementById('bbCustomBubbleStyle');
+    if(old) old.textContent='';
+  }
+
+  function installFlushStyle(){
+    let st=document.getElementById('bb-chat-full-edge-v3');
+    if(!st){ st=document.createElement('style'); st.id='bb-chat-full-edge-v3'; }
+    st.textContent=`
+      html,body{height:100%!important;}
+      html body #chatRoom{
+        position:fixed!important;
+        inset:0!important;
+        top:0!important;right:0!important;bottom:0!important;left:0!important;
+        width:100vw!important;
+        height:100dvh!important;
+        min-height:100dvh!important;
+        max-height:100dvh!important;
+        margin:0!important;
+        padding:0!important;
+        border:0!important;
+        border-radius:0!important;
+        transform:none!important;
+        box-sizing:border-box!important;
+        overflow:hidden!important;
+        z-index:99999!important;
+        background:#fff!important;
+      }
+      html body #chatRoom .chat-head{
+        position:absolute!important;
+        top:0!important;left:0!important;right:0!important;
+        width:100%!important;
+        height:calc(56px + env(safe-area-inset-top))!important;
+        min-height:calc(56px + env(safe-area-inset-top))!important;
+        margin:0!important;
+        padding:env(safe-area-inset-top) 20px 0!important;
+        box-sizing:border-box!important;
+        border-radius:0!important;
+        transform:none!important;
+        z-index:20!important;
+        background:#fff!important;
+      }
+      html body #chatRoom .chat-msgs,
+      html body #chatRoom #chatMsgs{
+        position:absolute!important;
+        top:calc(56px + env(safe-area-inset-top))!important;
+        right:0!important;
+        bottom:calc(64px + env(safe-area-inset-bottom))!important;
+        left:0!important;
+        width:100%!important;
+        height:auto!important;
+        margin:0!important;
+        box-sizing:border-box!important;
+        overflow-y:auto!important;
+        -webkit-overflow-scrolling:touch!important;
+      }
+      html body #chatRoom .chat-input-bar{
+        position:absolute!important;
+        left:0!important;right:0!important;bottom:0!important;top:auto!important;
+        width:100%!important;
+        height:calc(64px + env(safe-area-inset-bottom))!important;
+        min-height:calc(64px + env(safe-area-inset-bottom))!important;
+        max-height:calc(64px + env(safe-area-inset-bottom))!important;
+        margin:0!important;
+        padding:8px 18px calc(8px + env(safe-area-inset-bottom))!important;
+        box-sizing:border-box!important;
+        border-radius:0!important;
+        transform:none!important;
+        z-index:20!important;
+        background:#fff!important;
+      }
+    `;
+    document.head.appendChild(st);
+  }
+
+  function installEmptyPresetPanel(){
+    window.openBubbleSettings=function(){
+      clearOldCssOnce();
+      const title=document.getElementById('modalTitle');
+      const body=document.getElementById('modalBody');
+      if(title) title.textContent='气泡样式设置';
+      if(!body) return;
+      body.innerHTML=`
+        <div class="bb-setting-field">
+          <div class="bb-setting-label">自定义 CSS</div>
+          <textarea class="bb-setting-textarea" id="bbBubbleCss" placeholder="把你的聊天 CSS 粘贴到这里"></textarea>
+        </div>
+        <div class="bb-setting-actions">
+          <div class="option" onclick="applyBubbleCss()">应用 CSS</div>
+          <div class="option secondary-option" onclick="document.getElementById('bbBubbleCss').value=''">清空输入框</div>
+        </div>
+        <div class="bb-bubble-save-box-v290">
+          <div class="bb-setting-label">保存为预设</div>
+          <div class="bb-bubble-save-row-v290">
+            <input class="bb-setting-input" id="bbBubblePresetNameV290" maxlength="24" placeholder="填写预设名称">
+            <button type="button" onclick="saveBubblePresetV290()">保存</button>
+          </div>
+        </div>
+        <div class="bb-setting-label bb-bubble-list-title-v290">已保存预设</div>
+        <div class="bb-bubble-preset-list-v290" id="bbBubblePresetListV290">
+          <div class="bb-bubble-preset-empty-v290">还没有保存的预设</div>
+        </div>`;
+      if(typeof openPanel==='function') openPanel('modal');
+    };
+
+    window.resetBubbleCss=function(){
+      localStorage.removeItem('bb_custom_bubble_css');
+      localStorage.removeItem('bb_active_bubble_preset_v290');
+      const box=document.getElementById('bbBubbleCss');
+      if(box) box.value='';
+      const style=document.getElementById('bbCustomBubbleStyle');
+      if(style) style.textContent='';
+      if(typeof showToast==='function') showToast('已清空 CSS');
+    };
+  }
+
+  function boot(){
+    clearOldCssOnce();
+    installFlushStyle();
+    installEmptyPresetPanel();
+    setTimeout(installFlushStyle,100);
+    setTimeout(installFlushStyle,800);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
+  window.addEventListener('load',()=>{installFlushStyle();installEmptyPresetPanel();});
+})();
+</script>
+
+<style id="bb-safari-real-viewport-page2-v413">
+/* Safari 地址栏会改变真实可视高度。第二页改用实时 visualViewport，
+   并允许桌面内容纵向滚动，两个底部组件不再被浏览器工具栏或旧裁切规则截断。 */
+:root{--bb-real-vh:100dvh}
+html,body{
+  min-height:var(--bb-real-vh)!important;
+  height:var(--bb-real-vh)!important;
+}
+body.fullscreen-mode .phone{
+  height:var(--bb-real-vh)!important;
+  min-height:var(--bb-real-vh)!important;
+  max-height:var(--bb-real-vh)!important;
+}
+body.fullscreen-mode .screen,
+body.fullscreen-mode #desktop{
+  height:100%!important;
+  min-height:100%!important;
+  max-height:100%!important;
+}
+html body #desktop.page-two-mode{
+  overflow:hidden!important;
+}
+html body #desktop.page-two-mode .desk-scroll{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  padding:calc(env(safe-area-inset-top,0px) + 4px) 0 calc(112px + env(safe-area-inset-bottom,0px))!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior-y:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  touch-action:pan-y!important;
+  scrollbar-width:none!important;
+}
+html body #desktop.page-two-mode .desk-scroll::-webkit-scrollbar{display:none!important}
+html body #desktop.page-two-mode .pages-viewport,
+html body #desktop.page-two-mode .pages-container{
+  height:760px!important;
+  min-height:760px!important;
+  overflow:visible!important;
+}
+html body #desktop.page-two-mode .apps-page.page2-only{
+  height:760px!important;
+  min-height:760px!important;
+  overflow:visible!important;
+}
+html body #desktop.page-two-mode .p2-bottom-widgets{
+  overflow:visible!important;
+  clip-path:none!important;
+  contain:none!important;
+}
+html body #desktop.page-two-mode .dock{
+  position:absolute!important;
+  left:12px!important;
+  right:12px!important;
+  top:auto!important;
+  bottom:calc(4px + env(safe-area-inset-bottom,0px))!important;
+  height:87px!important;
+  margin:0!important;
+  z-index:900!important;
+  overflow:visible!important;
+}
+body.bb-page2-real-scroll{
+  touch-action:pan-y!important;
+  overscroll-behavior-y:none!important;
+}
+body.bb-page2-real-scroll .phone,
+body.bb-page2-real-scroll #desktop{
+  touch-action:pan-y!important;
+}
+</style>
+<script id="bb-safari-real-viewport-page2-v413-script">
+(function(){
+  'use strict';
+  if(window.__bbSafariRealViewportPage2V413)return;
+  window.__bbSafariRealViewportPage2V413=true;
+
+  var stableViewportHeight=0;
+  var stableViewportWidth=0;
+
+  function bbViewportEditableActive(){
+    var el=document.activeElement;
+    return !!(el&&el.matches&&el.matches('input,textarea,select,[contenteditable="true"]'));
+  }
+
+  function syncViewport(){
+    var vv=window.visualViewport;
+    var current=Math.max(320,Math.round((vv&&vv.height)||window.innerHeight||document.documentElement.clientHeight||844));
+    var width=Math.round((vv&&vv.width)||window.innerWidth||document.documentElement.clientWidth||390);
+    var focused=bbViewportEditableActive();
+
+    /* Safari 键盘弹出时 visualViewport 会突然缩短几百像素。
+       这不是豹豹机真实高度，不能拿它重设 html/body，否则页面下半段会露出黑底。 */
+    if(!stableViewportHeight||Math.abs(width-stableViewportWidth)>90){
+      stableViewportHeight=current;
+      stableViewportWidth=width;
+    }
+    var keyboardOpen=!!(focused&&stableViewportHeight-current>120);
+    if(!keyboardOpen){
+      stableViewportHeight=current;
+      stableViewportWidth=width;
+    }
+    var height=keyboardOpen?stableViewportHeight:current;
+    document.body.classList.toggle('bb-ios-keyboard-open',keyboardOpen);
+    document.documentElement.style.setProperty('--bb-real-vh',height+'px');
+    var phone=document.querySelector('.phone');
+    if(phone&&document.body.classList.contains('fullscreen-mode')){
+      phone.style.setProperty('height',height+'px','important');
+      phone.style.setProperty('min-height',height+'px','important');
+      phone.style.setProperty('max-height',height+'px','important');
+    }
+  }
+
+  function syncPage2(){
+    var desktop=document.getElementById('desktop');
+    var active=!!(desktop&&desktop.classList.contains('page-two-mode'));
+    document.body.classList.toggle('bb-page2-real-scroll',active);
+    if(!active)return;
+    var scroller=desktop.querySelector('.desk-scroll');
+    if(scroller){
+      scroller.style.setProperty('overflow-y','auto','important');
+      scroller.style.setProperty('overflow-x','hidden','important');
+      scroller.style.setProperty('height','100%','important');
+      scroller.style.setProperty('touch-action','pan-y','important');
+    }
+    var finalOverflow=document.getElementById('bugfix-pages-overflow-final-v411');
+    if(finalOverflow){
+      finalOverflow.textContent=
+        '#desktop:not(.page-two-mode) .pages-viewport,#desktop:not(.page-two-mode) .pages-container{overflow:hidden!important}'+
+        '#desktop.page-two-mode .pages-viewport,#desktop.page-two-mode .pages-container,#desktop.page-two-mode .apps-page.page2-only,#desktop.page-two-mode .p2-bottom-widgets{overflow:visible!important}';
+    }
+  }
+
+  function apply(){
+    syncViewport();
+    syncPage2();
+  }
+
+  function boot(){
+    apply();
+    var desktop=document.getElementById('desktop');
+    if(desktop&&!desktop.__bbPage2ClassObserverV413){
+      desktop.__bbPage2ClassObserverV413=true;
+      new MutationObserver(function(){requestAnimationFrame(apply)}).observe(desktop,{attributes:true,attributeFilter:['class']});
+    }
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
+  window.addEventListener('load',apply);
+  window.addEventListener('resize',apply,{passive:true});
+  window.addEventListener('orientationchange',function(){setTimeout(apply,120)},{passive:true});
+  window.addEventListener('pageshow',function(){setTimeout(apply,0)});
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',apply,{passive:true});
+    window.visualViewport.addEventListener('scroll',syncViewport,{passive:true});
+  }
+  [120,500,1200,2600].forEach(function(ms){setTimeout(apply,ms)});
+})();
+</script>
+
+<style id="bb-page2-left-widget-text-fix-v415">
+/* 左侧资料组件与右侧歌曲组件等高，并固定三行文字的独立行盒，防止 iOS 输入框文字互相覆盖。 */
+html body #desktop.page-two-mode .p2-mini-profile-card{
+  width:54%!important;
+  height:auto!important;
+  aspect-ratio:1015 / 906!important;
+  overflow:visible!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-copy{
+  top:17%!important;
+  height:52%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  gap:1px!important;
+  padding:4px 2px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-copy .p2-mini-edit{
+  display:block!important;
+  flex:0 0 auto!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  padding:0 4px!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-copy .p2-mini-title{
+  height:24px!important;
+  line-height:24px!important;
+  margin:0 0 1px!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-copy .p2-mini-line{
+  height:17px!important;
+  line-height:17px!important;
+  margin:0!important;
+}
+</style>
+
+
+<style id="bb-page2-left-widget-ghost-text-final-v416">
+/* 底图本身印有 new here / dreamer / coffee lover。使用完全不透明的覆盖层把旧字彻底盖住，只显示当前输入值。 */
+html body #desktop.page-two-mode .p2-mini-profile-copy{
+  left:43.5%!important;right:4.5%!important;top:14.5%!important;height:59%!important;
+  padding:8px 8px!important;gap:3px!important;
+  background:#fff!important;opacity:1!important;border-radius:12px!important;
+  box-shadow:0 0 0 2px #fff!important;overflow:hidden!important;isolation:isolate!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-copy::before{
+  content:""!important;position:absolute!important;inset:-4px!important;z-index:-1!important;
+  display:block!important;background:#fff!important;opacity:1!important;pointer-events:none!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-copy .p2-mini-edit{
+  position:relative!important;z-index:2!important;background:#fff!important;opacity:1!important;
+  text-shadow:none!important;-webkit-text-fill-color:currentColor!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-copy .p2-mini-title{height:25px!important;line-height:25px!important;margin:0!important;}
+html body #desktop.page-two-mode .p2-mini-profile-copy .p2-mini-line{height:18px!important;line-height:18px!important;margin:0!important;}
+</style>
+
+<style id="bb-api-keyboard-guard-v417">
+/* API / 设置输入框打开键盘时保持豹豹机完整高度，不露出黑色空区。 */
+html body.bb-ios-keyboard-open{
+  background:#f6f6f8!important;
+}
+html body.bb-ios-keyboard-open .phone,
+html body.bb-ios-keyboard-open .screen{
+  background:#f6f6f8!important;
+}
+html body.bb-non-desktop-keyboard #p2ProfileEditbar{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+html body.bb-ios-keyboard-open .panel,
+html body.bb-ios-keyboard-open .ios-settings,
+html body.bb-ios-keyboard-open #settings,
+html body.bb-ios-keyboard-open #apiSettings,
+html body.bb-ios-keyboard-open #chatAPI,
+html body.bb-ios-keyboard-open #visionAPI,
+html body.bb-ios-keyboard-open #imageAPI,
+html body.bb-ios-keyboard-open #minimaxAPI{
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior-y:contain!important;
+  scroll-padding-bottom:46vh!important;
+}
+</style>
+<script id="bb-api-keyboard-guard-v417-script">
+(function(){
+  'use strict';
+  if(window.__bbApiKeyboardGuardV417)return;
+  window.__bbApiKeyboardGuardV417=true;
+
+  function isDesktopTextInput(el){
+    return !!(el&&el.classList&&el.classList.contains('p2-profile-text-input'));
+  }
+
+  function closeDesktopTextEditor(){
+    try{
+      if(typeof window.finishPage2ProfileTextEdit==='function'){
+        window.finishPage2ProfileTextEdit(true);
+      }
+    }catch(_){ }
+    var bar=document.getElementById('p2ProfileEditbar');
+    if(bar){
+      bar.classList.remove('is-visible');
+      bar.setAttribute('aria-hidden','true');
+      bar.style.removeProperty('top');
+      bar.style.removeProperty('bottom');
+    }
+    document.querySelectorAll('.p2-profile-text-input.is-editing').forEach(function(input){
+      input.classList.remove('is-editing');
+      input.readOnly=true;
+    });
+  }
+
+  function restoreStableViewportSoon(){
+    [0,40,140,320,620].forEach(function(ms){
+      setTimeout(function(){
+        try{
+          var vv=window.visualViewport;
+          var event=new Event('resize');
+          window.dispatchEvent(event);
+          if(vv)vv.dispatchEvent(new Event('scroll'));
+        }catch(_){ }
+      },ms);
+    });
+  }
+
+  document.addEventListener('focusin',function(event){
+    var target=event.target;
+    var editable=!!(target&&target.matches&&target.matches('input,textarea,select,[contenteditable="true"]'));
+    if(!editable)return;
+    var desktop=isDesktopTextInput(target);
+    document.body.classList.toggle('bb-non-desktop-keyboard',!desktop);
+    if(!desktop){
+      closeDesktopTextEditor();
+      setTimeout(function(){
+        try{target.scrollIntoView({block:'center',inline:'nearest',behavior:'smooth'});}catch(_){ }
+      },220);
+    }
+    restoreStableViewportSoon();
+  },true);
+
+  document.addEventListener('focusout',function(){
+    setTimeout(function(){
+      var active=document.activeElement;
+      if(!(active&&active.matches&&active.matches('input,textarea,select,[contenteditable="true"]'))){
+        document.body.classList.remove('bb-non-desktop-keyboard');
+      }
+      restoreStableViewportSoon();
+    },180);
+  },true);
+
+  /* 一旦离开桌面进入设置/API等页面，旧的桌面文字确认条必须立刻结束。 */
+  document.addEventListener('click',function(event){
+    var target=event.target;
+    if(target&&target.closest&&target.closest('.panel,.ios-settings,#settings,#apiSettings,#chatAPI,#visionAPI,#imageAPI,#minimaxAPI')){
+      closeDesktopTextEditor();
+      document.body.classList.add('bb-non-desktop-keyboard');
+    }
+  },true);
+
+  window.addEventListener('pagehide',closeDesktopTextEditor);
+  window.addEventListener('pageshow',function(){setTimeout(restoreStableViewportSoon,0)});
+})();
+</script>
+
+</body>
+</html>
+
+<!-- 美化增强功能：
+屏幕模式保存
+灵动岛开关
+字体导入
+字体填入CSS
+-->
+
+<!--
+4.9.3 美化系统规划入口：
+- 桌面壁纸 desktopWallpaper
+- 锁屏/屏幕壁纸 lockWallpaper
+- Chat背景 chatWallpaper
+- 桌面头像 desktopAvatar
+- 桌面昵称 desktopName
+- 桌面文案 desktopStatus
+- 灵动岛开关 islandEnabled
+- 字体导入 fontImport
+- 全局CSS globalCSS
+全部使用localStorage保存
+-->
+
+<!-- 豹豹机 AI 中转接入层 v2 -->
+
+
+<!-- ===== 豹豹机修复：Me 页表情包管理 / 我的钱包弹窗可点击 ===== -->
+
+
+
+
+<!-- index(179)：新增 User 面具库与微信“我的人设”面具列表，桌面用户 app 改名为 User -->
+
+
+
+
+<!-- index(180)：修复引用条跑到聊天顶部，引用在发送前写入消息，并由最终气泡渲染器直接显示 -->
+
+
+
+
+
+<!-- index(181)：修复引用块白字，编辑消息改成完整卡片面板，保存后不再显示已编辑 -->
+
+
+
+
+<!-- index(182)：转账卡片改成 P2/P3 风格，去掉气泡内重复收款按钮，改为点开卡片后确认收款 -->
+
+
+
+<!-- index(183)：修复本地存储不足，图片按容量压缩，state 去重保存；朋友圈评论紧扣正文并支持未回复控诉 -->
+
+
+<!-- index(184)：转账对模型显示为真实转账语义，不再是裸数字；首页预览显示金额，转账消息不可撤回 -->
+
+
+<!-- index(185)：修复确认收款后卡片仍显示待处理，状态同步到 chatRecords 并由最终气泡直接显示 -->
+
+
+
+
+
+<!-- index(186)：修复聊天消息点击误进反侦察；长按菜单新增多选，可批量删除消息 -->
+
+
+
+
+<!-- index(187)：移除冲突的旧全局门禁；反侦察仅接受真实按在入口上的一次性物理点击 -->
+
+
+
+<!-- index(188)：新增反侦察自主触发总开关，默认关闭，开启后最短间隔 2 小时；朋友圈评论按角色去重 -->
+
+
+<!-- index(189)：朋友圈评论改为真实 API 人设生成，读取完整人设、用户面具、最近聊天与未回复关系；接口失败才使用本地兜底 -->
+<!-- index(216)：朋友圈评论增加单图视觉内容缓存，禁止万能短评，兜底句按动态正文、图片语境、关系和人设生成 -->
+
+
+
+<!-- index(190)：桌面“人设”改为短信 App；微信拉黑后角色可按人设通过短信解释、挽回或求复合 -->
+
+
+
+
+<!-- index(191)：新增线下模式基础框架；独立日记卡片页，深色正文、浅灰斜体心理描写、历史/场景设置/新场景/续写入口 -->
+
+
+
+
+<!-- index(192)：线下模式进一步美化；修复优先读取微信/面具/线上头像；保留历史与续写功能 -->
+
+
+
+<!-- index(193)：线下模式继续往 iCity 风格靠拢；顶栏改为“角色名 · 日记”，去掉右上角三个按钮，底部按钮改为收藏+发送图标风格 -->
+
+
+
+<!-- index(194)：线下模式背景进一步调成更白更灰；每张日记卡片底部新增喜欢/小纸条/存为图片/更多 操作排 -->
+
+
+
+<!-- index(195)：线下模式继续优化：背景更白、正文与标题字体缩小、强制补回底部日记操作排、用户副标题改为面具备注、线下生成篇幅目标改为约700~750字且不突然截断 -->
+
+
+
+<!-- index(196)：修复线下模式 sendChatCompletion 只传 temperature 导致实际一直走 fallback 的问题；补强 700~750 字提示；放大日记卡片底部操作栏与发送区按钮 -->
+
+
+<!-- index(197)：线下日记底部操作排重新排版，给“存为图片”留出更宽空间并改成转发/分享风格图标；同时把工具箱里的“线下”入口改为同步即时注入，修复首次打开时先空白后闪现的问题 -->
+
+
+
+
+<!-- index(199)：修复 index(198) 线下小纸条/更多看似点不动。根因是通用 modal 层级 90 被线下页 235 压住；现改为 320，并用捕获点击直接接管、关闭后留在线下页。 -->
+
+
+
+<!-- index(200)：修复线下剧情字数短且半句截断。线下请求改用专用高额度输出，读取真实字数设置；遇到 finish_reason=length、篇幅明显不足或句子未结束时自动续写并拼接，等待时间由15秒提高到60秒。 -->
+
+
+<!-- index(201)：线下心理描写改为穿插结构。约700~750字时通常生成3段独立心理描写，分别夹在动作/对白/场景正文之间；检测到心理集中或连续时自动按原剧情重排。 -->
+
+
+
+<!-- index(202)：线下日记卡片支持长按操作：编辑当前层、删除当前层、重回当前层并清除后续剧情。编辑角色卡时支持保留[正文]/[心里]结构。 -->
+
+
+<!-- index(203)：修复线下生成失败。线下不再自己直连或提交超大 max_tokens，而是完全复用线上微信的同一 sendChatCompletion/API 配置；需要长文时用同一接口续写拼接。 -->
+
+
+
+<!-- index(205)：对话、视觉识别、生图拆成三套独立 API；视觉拥有独立地址/Key/模型/预设/模型列表/照片与表情包测试，图片理解不再读取生图配置 -->
+
+
+
+
+
+<div id="bbStickerPicker" onclick="if(event.target===this)closeBaobaoStickerPicker()">
+  <div class="bb-sticker-picker-card">
+    <div class="bb-sticker-picker-head">
+      <div style="min-width:0;flex:1">
+        <div class="bb-sticker-picker-title">表情包</div>
+        <div class="bb-sticker-picker-count" id="bbStickerPickerCount">选择一个表情发送</div>
+      </div>
+      <button type="button" onclick="triggerBaobaoStickerImport()">＋ 导入</button>
+      <button type="button" onclick="openBaobaoStickerManagerFromChat()">管理</button>
+      <button type="button" class="bb-sticker-picker-close" onclick="closeBaobaoStickerPicker()">×</button>
+    </div>
+    <div class="bb-sticker-picker-grid" id="bbStickerPickerGrid"></div>
+  </div>
+</div>
+<input id="bbStickerQuickInput" type="file" accept="image/*" multiple hidden>
+<div class="bb-sticker-recognizing" id="bbStickerRecognizing">正在识别表情包含义…</div>
+
+<!-- index(206)：聊天工具箱新增真正的表情包入口；支持表情包库、相册/GIF导入、点击发送、视觉识别后交给同一聊天 API 回复 -->
+
+
+<!-- index(209)：修复表情包选择器被压成条状；识图结果只写隐藏字段，退出重进仍显示原图；角色可从用户表情包库中按人设主动发送表情包 -->
+
+<!-- index(214)：真正性能瘦身；固定图片资源压缩、移除全页观察器、取消表情包批量识图、降低兼容轮询、心声改按需刷新、token 修复仅扫描当前聊天 -->
+
+
+<!-- index(219)：在 Claude 修好的 index(218) 上重新装入聊天滚动稳定修复；不改其他功能 -->
+
+
+
+<!-- index(220)：新增夏以昼专属“男鬼窥屏”事件；仅感知豹豹机内部其他角色聊天，不接入语音 -->
+
+
+
+<!-- index(221)：加强男鬼窥屏连续闪屏；开场多次强闪，侵入后保留偶发轻微故障闪烁 -->
+
+
+<!-- index(222)：修复窥屏只闪两秒；输入过程中可触发，闪屏后保持到用户主动选择 -->
+
+
+
+<!-- index(223)：修复点击窥屏任意位置误退出；隐藏阶段按钮不可点击，空白区域完全拦截点击穿透 -->
+
+
+
+<!-- index(224)：解除窥屏旧状态锁死；测试按钮强制重启，自动清理不可见的遗留事件 -->
+
+
+
+<!-- index(225)：移除窥屏层属性循环观察，修复页面反复重算卡死；保留空白点击不退出 -->
+
+
+<!-- index(226)：修复角色聊天串线；切换前保存来源记录，目标记录独立加载，并清理旧版复制进夏以昼的整段聊天 -->
+
+
+<!-- index(227)：重做转账方向与钱包账单；自己发出的卡片不可收款，角色自动决定收/退；缩小比例；修复表情包标记掉格式 -->
+
+
+
+<!-- index(228)：私聊每轮完整读取当前用户面具；不再只知道用户名，不增加额外 API 请求 -->
+
+
+<!-- index(229)：彻底隔离角色聊天与异步回复；表情包仅聊天页可开，并从 IndexedDB/历史消息恢复 -->
+
+
+
+<!-- index(230)：重做世界书管理页；支持全局/当前角色、常驻/关键词触发、优先级，并接入私聊提示词 -->
+
+
+
+<!-- index(230)：世界书仅保留桌面独立 App，移除聊天设置旧入口 -->
+
+
+<!-- index(231)：从底层接管桌面世界书点击，彻底绕过旧“开发中”占位页 -->
+
+
+<!-- index(232)：世界书支持选择所有角色绑定；顶部改为柔和米杏色 -->
+
+
+<!-- index(233)：网易云音乐 App 前端；二维码绑定、搜歌、歌单和播放器，支持演示模式与未来真实后端 -->
+
+
+
+<!-- index(234)：统一世界书与音乐 App 为豹豹机黑白灰风格；不改功能，只校正视觉 -->
+
+
+<!-- index(237)：链接看图理解 + 手动回复控制 + 表情包格式与破图修复 -->
+
+
+
+<!-- index(237)：手动回复控制、破图隐藏、表情包标记强力修复 -->
+
+
+
+<!-- index(238)：链接卡片不压头像、封面后端代理、表情包即时可点、发送性能优化 -->
+
+
+
+<!-- index(241)：音乐播放器强制可点 + 可见错误状态 + 失败后重新播放 -->
+
+
+
+<!-- index(240)：网易云 HTTPS 流式播放 + 豹豹机灵动岛音乐控制 -->
+
+
+
+<!-- index(241)：修复音乐播放器整页点不动、错误提示被遮挡、失败后无法重试 -->
+
+
+
+<!-- index(243)：MiniMax 真实语音消息第一阶段 -->
+
+
+
+<!-- index(244)：MiniMax 音色改为每个私聊角色单独设置 -->
+
+
+
+<!-- index(245)：iPhone Web Push 后台回复与系统通知 -->
+
+
+<!-- index(246)：后台消息通知移动到主设置，全局作用于所有角色 -->
+
+
+<!-- index(247)：修复历史假语音占位符 -->
+
+<!-- index(247)：手动点回复才生成；切走后可靠通知；假语音转真实语音气泡 -->
+
+
+<!-- index(248)：本轮确认修改——紧凑语音、静默后台、转账状态、短信重做 -->
+
+
+
+<!-- index(251)：修复后台通知控制器被丝滑回复覆盖 -->
+
+
+
+<!-- index(264)：线下模式点击修复。删除 261/262 的循环扫描与重复套壳，只做一次性打开/关闭，不再占满主线程。 -->
+
+<!-- index(266)：国内直连测试版。给对话 API 增加 DeepSeek / 通义千问一键线路，聊天、短信、朋友圈、线下等文字功能共用。 -->
+
+
+<!-- index(267)：国内多线路完整版。在 266 基础上加入 MiniMax、Kimi、智谱 GLM 与自定义线路，并修正不同平台的请求兼容。 -->
+
+
+<!-- index(268)：恢复真人聊天最终层。回复键静止透明；多条消息逐条到达；明确要求语音时直接生成语音。 -->
+
+
+<!-- index(269)：从259恢复完整查手机App，同时保留268国内线路与聊天顺滑修复 -->
+
+<div id="bbSubjectAppPanel">
+  <div class="bbspa-head">
+    <div class="bbspa-back" id="bbspaBack" onclick="bbPhoneAppBack()">‹</div>
+    <div class="bbspa-title" id="bbspaTitle">App</div>
+    <div class="bbspa-action" id="bbspaAction"></div>
+  </div>
+  <div class="bbspa-body" id="bbspaBody"></div>
+  <div class="bbspa-chat" id="bbspaChat">
+    <div class="bbspa-chat-messages" id="bbspaChatMessages"></div>
+    <div class="bbspa-chat-input"><input id="bbspaChatInput" placeholder="用TA的手机发消息…"><button class="bbspa-chat-send" onclick="bbPhoneSendWechat()">发送</button></div>
+  </div>
+</div>
+<div class="bbspa-settings-sheet" id="bbspaSettingsSheet" onclick="if(event.target===this)bbPhoneHideSettings()">
+  <div class="bbspa-settings-card">
+    <h3>查手机设置</h3>
+    <div class="bbspa-setting-option" onclick="bbPhoneGenerateData();bbPhoneHideSettings()">根据人设和聊天重新生成</div>
+    <div class="bbspa-setting-option" onclick="bbPhoneLocalRefresh();bbPhoneHideSettings()">快速刷新本地内容</div>
+    <div class="bbspa-setting-option danger" onclick="bbPhoneClearCurrent();bbPhoneHideSettings()">清空这个角色的手机内容</div>
+    <div class="bbspa-setting-option" onclick="bbPhoneHideSettings()">取消</div>
+  </div>
+</div>
+
+
+<!-- index(274)：从可正常启动的 269 恢复；不带 270/271 的高频观察补丁。修复工具箱透明遮罩和旧 inline pointer-events。 -->
+
+
+<!-- index(275)：只修两件事：备份导入在刷新时被旧页面回写覆盖；iPhone 隐藏聊天后遗留表情包合成黑块。 -->
+
+<!-- index(277)：修复导入后被 pagehide 自动保存重新覆盖。导入时冻结旧页面写入，并在主状态读取前二次落盘，确保人设、聊天、头像与壁纸真正载入。 -->
+
+<!-- index(278)：角色可自行判断是否把用户发来的图片设为自己的头像，而不是机械抓取"最新一条消息" -->
+
+
+<!-- index(284)：锁屏解锁兜底。即使主初始化中途报错，锁屏仍可上划或点击进入密码页。 -->
+
+<!-- index(310)：修复角色朋友圈归属、隐藏反侦察大卡片，并移除每次点击扫描造成的卡顿。 -->
+<!-- index(311)：生图中转站直连、角色按聊天要求自动发照片、Chat 首页表情包显示名称。 -->
+<!-- index(312)：首页文字组件仅在桌面显示；短信改为进入会话后才调用 API，并强化人设、世界书、独立记忆与说话样本。 -->
+
+<!-- index(317)：修复松散表情包格式，AI 若输出“[表情包] 名称”也会转回真正表情包；生图新增帅图优化与内置提示词。 -->
+
+<!-- index(318)：爱心按钮在角色刚创建、用户尚未发过消息时不会生成；聊过一句后每次按都会让角色自然续聊，极长聊天才提示清理。 -->
+
+<!-- index(319)：聊天格式硬锁；表情包、照片等媒体标记不会再掉成可见文字，长对话提示改为“他已经说太多话了，你回复一下吧”。 -->
+
+<!-- index(320)：彻底移除 [photo]、[image] 等伪媒体标签，并自动清理旧聊天中的同类标签。 -->
+
+<!-- index(321)：媒体顺序硬锁；文字、表情包或照片、后续文字会按真实发送顺序逐条出现，媒体未发送成功前不会提前显示后续消息。 -->
+
+<!-- index(322)：角色可以给用户气泡点上标表情；表情作为气泡边缘回应显示，不会掉成聊天文字。 -->
+
+<!-- index(323)：强化人设行为强度；非常黏人、死皮赖脸、活泼、会撒娇等特质会稳定落实到每轮回复，周树生不再被压成普通克制男友。 -->
+
+<!-- index(324)：每个角色可选择自动、年下黏糊、年上简洁或自然人设；聊天核心按模式硬路由并分别检查重写。 -->
+
+<!-- index(326)：修正第一页组件顺序；只保留三图组件，八个 App 放在组件下方，移除旧英文条和大号桌面时间。 -->
+
+
+<style id="bb-page2-left-widget-ghost-kill-v418">
+/* 彻底遮住资料卡底图里印死的旧英文，只显示当前输入的三行文字。 */
+html body #desktop.page-two-mode .p2-mini-profile-card::after{
+  content:""!important;
+  position:absolute!important;
+  left:38.5%!important;
+  right:1.2%!important;
+  top:11.5%!important;
+  height:61.5%!important;
+  z-index:4!important;
+  display:block!important;
+  background:#fff!important;
+  opacity:1!important;
+  border-radius:14px!important;
+  box-shadow:0 0 0 3px #fff!important;
+  pointer-events:none!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-copy{
+  left:39.5%!important;
+  right:1.8%!important;
+  top:12.5%!important;
+  height:59.5%!important;
+  z-index:8!important;
+  padding:8px 10px!important;
+  background:#fff!important;
+  background-image:none!important;
+  opacity:1!important;
+  box-shadow:none!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  isolation:isolate!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-copy::before,
+html body #desktop.page-two-mode .p2-mini-profile-copy::after{
+  content:none!important;
+  display:none!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-copy .p2-mini-edit{
+  position:relative!important;
+  z-index:9!important;
+  display:block!important;
+  width:100%!important;
+  background:#fff!important;
+  background-image:none!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+  box-shadow:none!important;
+  -webkit-text-stroke:0 transparent!important;
+  mix-blend-mode:normal!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-copy .p2-mini-title{
+  height:26px!important;
+  line-height:26px!important;
+  margin:0 0 2px!important;
+}
+html body #desktop.page-two-mode .p2-mini-profile-copy .p2-mini-line{
+  height:19px!important;
+  line-height:19px!important;
+  margin:0!important;
+}
+</style>
+
+<!-- v418：导入冻结旧保存器并校验 IndexedDB；资料卡底图旧英文彻底遮盖。 -->
+
+
+<!-- v419：iPhone 状态栏去重、桌面边缘滑动拦截、第二页旧桌面元素强制隐藏。 -->
+<!-- v421：在 v420 基础上把 app.js 里 3 张大图（约 2.3MB）抽成独立图片文件，app.js 从 4.06MB 降到 1.77MB；并修复 sw.js 首次安装时重复下载全部核心文件的问题。 -->
